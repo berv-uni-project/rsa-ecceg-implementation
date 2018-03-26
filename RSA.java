@@ -7,6 +7,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.File;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.FileReader;
 
 class RSA {
     BigInteger p;
@@ -18,8 +22,12 @@ class RSA {
 
     public static void main(String[] args) {
         RSA rsa = new RSA();
-        rsa.generateKey();
+        rsa.generateKey(2048);
+        rsa.writeKeyToFile("private.pri", rsa.n, rsa.priExp);
+        rsa.writeKeyToFile("public.pub", rsa.n, rsa.pubExp);
+        rsa.readKey("public.pub", false);
         rsa.encryptedFile("README.md", "README-ENCRYPTED", rsa.pubExp, rsa.n);
+        System.out.println(rsa.showHexFromFile("README-ENCRYPTED"));
         rsa.decryptFile("README-ENCRYPTED", "README-DECRYPTED.md", rsa.priExp, rsa.n);
     }
 
@@ -28,17 +36,13 @@ class RSA {
         return !(obj != null);
     }
 
-    public void generateKey() {
-        int bitlength = 1024;
+    public void generateKey(int bitLength) {
+        int bitlength = bitLength;
         SecureRandom rnd = new SecureRandom();
         p = BigInteger.probablePrime(75 * bitlength / 100, rnd);
         q = BigInteger.probablePrime(25 * bitlength / 100, rnd);
-        System.out.println("P:" + p);
-        System.out.println("Q:" + q);
         n = p.multiply(q);
         phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
-        System.out.println("n:" + n);
-        System.out.println("phi:" + phi);
         BigInteger i;
         for (i = BigInteger.probablePrime(bitlength / 10, rnd); i.compareTo(n) < 0; i = i.nextProbablePrime()) {
             if (i.gcd(phi).equals(BigInteger.ONE)) {
@@ -47,6 +51,66 @@ class RSA {
             }
         }
         priExp = pubExp.modInverse(phi);
+    }
+
+    private final String HEXES = "0123456789ABCDEF";
+
+    public String showHexFromFile(String file) {
+        byte[] sourceBytes = getBytes(file);
+        if (isNull(sourceBytes)) {
+            return "";
+        }
+        return getHex(sourceBytes);
+    }
+
+    private String getHex(byte[] raw) {
+        final StringBuilder hex = new StringBuilder(2 * raw.length);
+        for (final byte b : raw) {
+            hex.append(this.HEXES.charAt((b & 0xF0) >> 4)).append(this.HEXES.charAt((b & 0x0F)));
+        }
+        return hex.toString();
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    public void writeKeyToFile(String name, BigInteger n, BigInteger d) {
+        String output = n.toString() + ":" + d.toString();
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(name));
+            writer.write(output);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void readKey(String location, boolean isPrivate) {
+        try (BufferedReader br = new BufferedReader(new FileReader(location))) {
+
+            String sCurrentLine = br.readLine();
+            if (sCurrentLine != null) {
+                String[] key = sCurrentLine.split(":");
+                this.n = new BigInteger(key[0]);
+                BigInteger d = new BigInteger(key[1]);
+                if (isPrivate) {
+                    this.priExp = d;
+                } else {
+                    this.pubExp = d;
+                }
+            }
+            br.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean decryptFile(String source, String destination, BigInteger d, BigInteger n) {
