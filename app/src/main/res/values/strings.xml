@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">ECCEG_RSA_APP</string>
+    <string name="ecceg_rsa_application"><![CDATA[ECCEG & RSA APPLICATION]]></string>
+    <string name="title_activity_rsa">RSAActivity</string>
+    <string name="generate_key">Generate Key</string>
+    <string name="private_key_location">Private Key Name</string>
+    <string name="public_key_location">Public Key Name</string>
+    <string name="byte_size">Byte Size</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_choose_file">Choose File</string>
 </resources>
