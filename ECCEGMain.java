@@ -42,7 +42,7 @@ public class ECCEGMain {
             String public_key_filepath = "key.pub";
             String plainfile = "datatest.txt";
             String ciphfile = "datatest.txt.ciph";
-            ECCEGMain.decryptFile(ecc, private_key_filepath, public_key_filepath, plainfile, ciphfile);
+            ECCEGMain.decryptFile(ecc, private_key_filepath, plainfile, ciphfile);
         }
         else System.out.println("Wrong choice!!");
     }
@@ -84,13 +84,11 @@ public class ECCEGMain {
             fr.savePointsToFile(filepath_ciph, enc);
     }
 
-    public static void decryptFile(ECC ecc, String private_key_filepath, String public_key_filepath, 
+    public static void decryptFile(ECC ecc, String private_key_filepath, 
         String filepath_plain, String filepath_ciph) throws Exception {
             ECCEG ecceg = new ECCEG(ecc, ecc.getBasePoint());
             ecceg.loadPrivateKey(private_key_filepath);
             System.out.println("Private key loaded...");
-            ecceg.loadPublicKey(public_key_filepath);
-            System.out.println("Public key loaded...");
             FileReader fr = new FileReader();
             List<Pair<Point,Point>> read_enc = fr.loadPointsFromFile(filepath_ciph);
             List<Point> read_dec = ecceg.decrypt(read_enc);
