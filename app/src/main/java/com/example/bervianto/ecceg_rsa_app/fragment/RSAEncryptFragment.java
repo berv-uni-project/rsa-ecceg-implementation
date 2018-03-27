@@ -9,12 +9,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.bervianto.ecceg_rsa_app.R;
 import com.example.bervianto.ecceg_rsa_app.rsa.RSA;
-import com.gun0912.tedpermission.PermissionListener;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
@@ -53,8 +51,18 @@ public class RSAEncryptFragment extends Fragment {
     @BindView(R.id.InputValue)
     TextInputEditText inputValue;
 
+    @BindView(R.id.InputSizeValue)
+    TextInputEditText inputSize;
+
+    @BindView(R.id.outputSizeValue)
+    TextInputEditText outputSize;
+
+    @BindView(R.id.timeValue)
+    TextInputEditText timeValue;
+
     private String keyPath;
     private ACProgressFlower loadingView;
+    private long startTime;
 
     public RSAEncryptFragment() {
         // Required empty public constructor
@@ -104,6 +112,7 @@ public class RSAEncryptFragment extends Fragment {
                     @Override
                     public void onChoosePath(String path, File pathFile) {
                         encryptLoc.setText(pathFile.getPath());
+                        inputSize.setText(String.valueOf(pathFile.length()));
                         loadingView.show();
                         new RSAEncryptFragment.SetInput(RSAEncryptFragment.this).execute(pathFile.getPath());
                     }
@@ -142,13 +151,18 @@ public class RSAEncryptFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
+            startTime = System.currentTimeMillis();
             RSA.encryptedFile(strings[0],strings[1],new BigInteger(strings[3]), new BigInteger(strings[2]));
             return RSA.showHexFromFile(strings[1]);
         }
 
         @Override
         protected void onPostExecute(String hex) {
+            long endTime = System.currentTimeMillis();
+            timeValue.setText(String.valueOf(endTime-startTime));
             outputValue.setText(hex);
+            File file = new File(Environment.getExternalStorageDirectory().getPath()+"/RSA/"+encryptLocValue.getText().toString());
+            outputSize.setText(String.valueOf(file.length()));
             loadingView.dismiss();
             Toast.makeText(getActivity(),"Finished Encrypt",Toast.LENGTH_SHORT).show();
         }

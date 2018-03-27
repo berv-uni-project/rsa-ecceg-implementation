@@ -46,8 +46,18 @@ public class RSADecryptFragment extends Fragment {
     @BindView(R.id.InputValueDecrypt)
     TextInputEditText inputValue;
 
+    @BindView(R.id.outputSizeValueDecrypt)
+    TextInputEditText outputSize;
+
+    @BindView(R.id.InputSizeValueDecrypt)
+    TextInputEditText inputSize;
+
+    @BindView(R.id.timeValueDecrypt)
+    TextInputEditText timeElapsedDecrypt;
+
     private String keyPath;
     private ACProgressFlower loadingView;
+    private long startTime;
 
     public RSADecryptFragment() {
         // Required empty public constructor
@@ -96,6 +106,7 @@ public class RSADecryptFragment extends Fragment {
                     @Override
                     public void onChoosePath(String path, File pathFile) {
                         decryptFileLoc.setText(pathFile.getPath());
+                        inputSize.setText(String.valueOf(pathFile.length()));
                         loadingView.show();
                         new RSADecryptFragment.SetInput(RSADecryptFragment.this).execute(pathFile.getPath());
                     }
@@ -134,6 +145,7 @@ public class RSADecryptFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
+            startTime = System.currentTimeMillis();
             RSA.decryptFile(strings[0],strings[1],new BigInteger(strings[3]), new BigInteger(strings[2]));
             byte[] bytes = RSA.getBytes(strings[1]);
             if (bytes != null)
@@ -144,7 +156,11 @@ public class RSADecryptFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String hex) {
+            long endTime = System.currentTimeMillis();
+            timeElapsedDecrypt.setText(String.valueOf(endTime-startTime));
             outputValue.setText(hex);
+            File file = new File(Environment.getExternalStorageDirectory().getPath()+"/RSA/"+decryptDestination.getText().toString());
+            outputSize.setText(String.valueOf(file.length()));
             loadingView.dismiss();
             Toast.makeText(getActivity(),"Finished Decrypt", Toast.LENGTH_SHORT).show();
         }
