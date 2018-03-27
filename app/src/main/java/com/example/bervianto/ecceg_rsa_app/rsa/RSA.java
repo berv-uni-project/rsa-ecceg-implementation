@@ -105,10 +105,10 @@ public class RSA {
 
         try {
             out = new BufferedOutputStream(new FileOutputStream(destination));
-            for (byte[] aC : C) {
-                if (aC.length != k)
+            for (int i = 0; i < C.length; i++) {
+                if (C[i].length != k)
                     return false;
-                c = new BigInteger(aC);
+                c = new BigInteger(C[i]);
                 m = decrypt(c, d, n);
                 EB = toByteArray(m, k);
                 M = extractData(EB);
@@ -119,7 +119,7 @@ public class RSA {
             return false;
         } finally {
             try {
-                if (isNull(out))
+                if (!isNull(out))
                     out.close();
             } catch (IOException e) {
                 return false;
@@ -146,7 +146,7 @@ public class RSA {
         return c.modPow(d, n);
     }
 
-    private static byte[] getBytes(String fileName) {
+    public static byte[] getBytes(String fileName) {
         File fIn = new File(fileName);
         if (!fIn.canRead()) {
             System.err.println("Can't read " + fileName);

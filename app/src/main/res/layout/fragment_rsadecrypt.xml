@@ -4,13 +4,13 @@
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.bervianto.ecceg_rsa_app.fragment.RSAEncryptFragment">
+    tools:context="com.example.bervianto.ecceg_rsa_app.fragment.RSADecryptFragment">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/layout_n_key"
+            android:id="@+id/layout_n_key_decrypt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -18,17 +18,17 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+            app:layout_constraintTop_toBottomOf="@+id/private_key_layout">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/n_value_encrypt"
+                android:id="@+id/n_value_decrypt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Modulus N" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/textInputLayout2"
+            android:id="@+id/private_key_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -36,24 +36,24 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3">
+            app:layout_constraintTop_toBottomOf="@+id/titleDecrypt">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/public_key_value"
+                android:id="@+id/private_key_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Public Key" />
+                android:hint="Private Key" />
 
         </android.support.design.widget.TextInputLayout>
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/titleDecrypt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="28dp"
-            android:text="Encryption"
+            android:text="Decryption"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +62,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <mehdi.sakout.fancybuttons.FancyButton
-            android:id="@+id/open_public_button"
+            android:id="@+id/open_private_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -70,18 +70,18 @@
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_n_key"
+            app:layout_constraintTop_toBottomOf="@+id/layout_n_key_decrypt"
             fancy:fb_borderColor="#FFFFFF"
             fancy:fb_borderWidth="1dp"
             fancy:fb_defaultColor="#0FF00F"
             fancy:fb_focusColor="#9bd823"
             fancy:fb_iconPosition="left"
             fancy:fb_radius="10dp"
-            fancy:fb_text="Search Public Key"
+            fancy:fb_text="Search Private Key"
             fancy:fb_textColor="#FFFFFF" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/file_encrypt_open"
+            android:id="@+id/file_decrypt_open"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -90,18 +90,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/open_public_button">
+            app:layout_constraintTop_toBottomOf="@id/open_private_button">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/file_encrypt_value"
+                android:id="@+id/file_decrypt_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:hint="File to Encrypt" />
+                android:hint="File to Decrypt" />
         </android.support.design.widget.TextInputLayout>
 
         <mehdi.sakout.fancybuttons.FancyButton
-            android:id="@+id/select_encrypt_file_button"
+            android:id="@+id/select_decrypt_file_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -109,7 +109,7 @@
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/file_encrypt_open"
+            app:layout_constraintTop_toBottomOf="@+id/file_decrypt_open"
             fancy:fb_borderColor="#FFFFFF"
             fancy:fb_borderWidth="1dp"
             fancy:fb_defaultColor="#000CFF"
@@ -120,7 +120,7 @@
             fancy:fb_textColor="#FFFFFF" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/file_encrypt_loc"
+            android:id="@+id/file_decrypt_loc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -129,17 +129,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/select_encrypt_file_button">
+            app:layout_constraintTop_toBottomOf="@id/select_decrypt_file_button">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/file_encrypt_loc_value"
+                android:id="@+id/file_decrypt_loc_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Encrypt File Name" />
+                android:hint="Decrypt File Name" />
         </android.support.design.widget.TextInputLayout>
 
         <mehdi.sakout.fancybuttons.FancyButton
-            android:id="@+id/encrypt_button"
+            android:id="@+id/decrypt_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -147,18 +147,18 @@
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/file_encrypt_loc"
+            app:layout_constraintTop_toBottomOf="@+id/file_decrypt_loc"
             fancy:fb_borderColor="#FFFFFF"
             fancy:fb_borderWidth="1dp"
             fancy:fb_defaultColor="#000CFF"
             fancy:fb_focusColor="#9bd823"
             fancy:fb_iconPosition="left"
             fancy:fb_radius="10dp"
-            fancy:fb_text="Encrypt"
+            fancy:fb_text="Decrypt"
             fancy:fb_textColor="#FFFFFF" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/outputLayout"
+            android:id="@+id/outputLayoutDecrypt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -167,17 +167,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/inputLayout">
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/outputValue"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:enabled="false"
-            android:hint="Output" />
+            app:layout_constraintTop_toBottomOf="@id/inputLayoutDecrypt">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/outputValueDecrypt"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:enabled="false"
+                android:hint="Output" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/inputLayout"
+            android:id="@+id/inputLayoutDecrypt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -186,13 +186,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/encrypt_button">
+            app:layout_constraintTop_toBottomOf="@id/decrypt_button">
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/InputValue"
+                android:id="@+id/InputValueDecrypt"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:enabled="false"
                 android:hint="Input" />
         </android.support.design.widget.TextInputLayout>
     </android.support.constraint.ConstraintLayout>
+
 </ScrollView>

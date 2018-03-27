@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.example.bervianto.ecceg_rsa_app.fragment.RSADecryptFragment;
 import com.example.bervianto.ecceg_rsa_app.fragment.RSAEncryptFragment;
 import com.example.bervianto.ecceg_rsa_app.fragment.RSAGenerateKeyFragment;
 
@@ -26,7 +27,7 @@ public class RSAPagerAdapter extends FragmentPagerAdapter {
             } else if (position == 1){
                 return RSAEncryptFragment.newInstance();
             } else if (position == 2) {
-                return RSAGenerateKeyFragment.newInstance();
+                return RSADecryptFragment.newInstance();
             } else {
                 return null;
             }

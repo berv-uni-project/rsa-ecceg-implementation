@@ -71,8 +71,8 @@ public class RSAGenerateKeyFragment extends Fragment {
                     newLocation.mkdir();
                 }
                 loadingView.show();
-                new GenerateKey(RSAGenerateKeyFragment.this).execute(byteSize.getText().toString(), newLocation.getAbsolutePath() + privateLocation.getText().toString(),
-                        newLocation.getAbsolutePath()+publicLocation.getText().toString());
+                new GenerateKey(RSAGenerateKeyFragment.this).execute(byteSize.getText().toString(), newLocation.getAbsolutePath() +"/"+ privateLocation.getText().toString(),
+                        newLocation.getAbsolutePath()+"/"+publicLocation.getText().toString());
             }
 
             @Override
