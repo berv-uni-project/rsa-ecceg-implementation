@@ -32,70 +32,51 @@ public class ECCEG {
     public void setPublicKey(Point publicKey) { this.publicKey = publicKey; }
     public void setPrivateKey(BigInteger privateKey) { this.privateKey = privateKey; }
 
-    public boolean savePublicKey(String fileName) {
-        try {
-            File file = new File(fileName);
-            if (!file.exists()) file.createNewFile();
-            FileOutputStream fop = new FileOutputStream(file);
-            fop.write(publicKey.x.toString().getBytes());
-            fop.write(' ');
-            fop.write(publicKey.y.toString().getBytes());
-            fop.flush();
-            fop.close();
-            return true;
-        } catch (IOException e) {
-        }
-        return false;
+    public void savePublicKey(String fileName) throws Exception {
+        // disimpan x dan y, dipisahkan dengan spasi
+        File file = new File(fileName);
+        if (!file.exists()) file.createNewFile();
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(publicKey.x.toString().getBytes());
+        out.write(' ');
+        out.write(publicKey.y.toString().getBytes());
+        out.flush();
+        out.close();
     }
 
-    public boolean savePrivateKey(String fileName) {
-        try {
-            File file = new File(fileName);
-            if (!file.exists()) file.createNewFile();
-            FileOutputStream fop = new FileOutputStream(file);
-            fop.write(privateKey.toString().getBytes());
-            fop.flush();
-            fop.close();
-            return true;
-        } catch (IOException e) {
-        }
-        return false;
+    public void savePrivateKey(String fileName) throws Exception {
+        File file = new File(fileName);
+        if (!file.exists()) file.createNewFile();
+        FileOutputStream out = new FileOutputStream(file);
+        out.write(privateKey.toString().getBytes());
+        out.flush();
+        out.close();
     }
 
-    public boolean loadPublicKey(String fileName) {
-        try {
-            File file = new File(fileName);
-            Scanner sc = new Scanner(file);
-            BigInteger x = null, y = null;
-            if (sc.hasNextBigInteger()) x = sc.nextBigInteger();
-            if (sc.hasNextBigInteger()) y = sc.nextBigInteger();
-            sc.close();
-            if (x != null && y != null) {
-                Point point = new Point();
-                point.x = x;
-                point.y = y;
-                this.publicKey = point;
-                return true;
-            }
-        } catch (IOException e) {
+    public void loadPublicKey(String fileName) throws Exception {
+        File file = new File(fileName);
+        Scanner sc = new Scanner(file);
+        BigInteger x = null, y = null;
+        if (sc.hasNextBigInteger()) x = sc.nextBigInteger();
+        if (sc.hasNextBigInteger()) y = sc.nextBigInteger();
+        sc.close();
+        if (x != null && y != null) {
+            Point point = new Point();
+            point.x = x;
+            point.y = y;
+            this.publicKey = point;
         }
-        return false;
     }
 
-    public boolean loadPrivateKey(String fileName) {
-        try {
-            File file = new File(fileName);
-            Scanner sc = new Scanner(file);
-            BigInteger i = null;
-            if (sc.hasNextBigInteger()) i = sc.nextBigInteger();
-            sc.close();
-            if (i != null) {
-                this.privateKey = i;
-                return true;
-            }
-        } catch (IOException e) {
+    public void loadPrivateKey(String fileName) throws Exception {
+        File file = new File(fileName);
+        Scanner sc = new Scanner(file);
+        BigInteger i = null;
+        if (sc.hasNextBigInteger()) i = sc.nextBigInteger();
+        sc.close();
+        if (i != null) {
+            this.privateKey = i;
         }
-        return false;
     }
 
     public Pair<Point, Point> encrypt(Point p) {
