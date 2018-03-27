@@ -62,9 +62,6 @@ public class ECCEGMain {
         }
         System.out.println();
         System.out.println("---======END======---");
-        List<Point> dec = ecceg.decrypt(enc);
-        for (Point pp: dec) System.out.print((char)ecc.pointToInt(pp).byteValue());
-        System.out.println();
         fr.savePointsToFile(filepath_ciph, enc);
     }
 
