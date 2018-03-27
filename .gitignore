@@ -11,6 +11,11 @@
 # Compiled class file
 *.class
 
+# Other generated file file
+*.pri
+*.pub
+*.ciph
+
 # Log file
 *.log
 
