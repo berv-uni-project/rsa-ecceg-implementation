@@ -2,7 +2,7 @@ import java.math.BigInteger;
 
 public class ECC {
     public BigInteger a, b, p; // y = x^3 + ax + b mod p
-    private BigInteger k = BigInteger.valueOf(20);
+    public BigInteger k = BIG_ZERO;
     private static final BigInteger BIG_ZERO = BigInteger.ZERO, BIG_ONE = BigInteger.valueOf(1),
         BIG_TWO = BigInteger.valueOf(2);
 
