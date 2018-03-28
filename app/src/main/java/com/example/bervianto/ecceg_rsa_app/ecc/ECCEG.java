@@ -1,6 +1,7 @@
 package com.example.bervianto.ecceg_rsa_app.ecc;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.*;
 import java.io.*;
 
@@ -82,7 +83,7 @@ public class ECCEG {
     }
 
     public Pair<Point, Point> encrypt(Point p) {
-        BigInteger k = new BigInteger(ECC.p.bitLength(), new Random())
+        BigInteger k = new BigInteger(ECC.p.bitLength(), new SecureRandom())
             .mod(ECC.p.subtract(BigInteger.ONE))
             .add(BigInteger.ONE);
         Point left = ECC.multiply(k, basePoint);
