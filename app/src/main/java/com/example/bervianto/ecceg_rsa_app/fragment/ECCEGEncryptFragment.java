@@ -39,7 +39,6 @@ import static android.os.Environment.getExternalStorageDirectory;
  */
 public class ECCEGEncryptFragment extends Fragment {
 
-
     @BindView(R.id.public_key_loc_ecceg_value)
     TextInputEditText publicKeyLoc;
 
@@ -72,6 +71,9 @@ public class ECCEGEncryptFragment extends Fragment {
 
     @BindView(R.id.p_encrypt_ecceg_value)
     TextInputEditText p;
+
+    @BindView(R.id.k_encrypt_ecceg_value)
+    TextInputEditText k;
 
     private ACProgressFlower loadingView;
     private long startTime;
@@ -116,6 +118,7 @@ public class ECCEGEncryptFragment extends Fragment {
                     a.getText().toString(),
                     b.getText().toString(),
                     p.getText().toString(),
+                    k.getText().toString(),
                     publicKeyLoc.getText().toString(),
                     plainTextLoc.getText().toString(),
                     cipherLoc
@@ -174,13 +177,14 @@ public class ECCEGEncryptFragment extends Fragment {
                 ecc.a = new BigInteger(strings[0]);
                 ecc.b = new BigInteger(strings[1]);
                 ecc.p = new BigInteger(strings[2]);
+                ecc.k = new BigInteger(strings[3]);
                 ECCEG ecceg = new ECCEG(ecc, ecc.getBasePoint());
-                ecceg.loadPublicKey(strings[3]);
-                byte[] read = FileUtils.getBytes(strings[4]);
+                ecceg.loadPublicKey(strings[4]);
+                byte[] read = FileUtils.getBytes(strings[5]);
                 List<Pair<Point,Point>> enc = ecceg.encryptBytes(read);
-                FileUtils.savePointsToFile(strings[5], enc);
+                FileUtils.savePointsToFile(strings[6], enc);
                 endTime = System.currentTimeMillis();
-                return FileUtils.showHexFromFile(strings[5]);
+                return FileUtils.showHexFromFile(strings[6]);
             } catch (Exception e) {
                 return "failed";
             }

@@ -4,7 +4,7 @@
     xmlns:fancy="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.bervianto.ecceg_rsa_app.fragment.RSAEncryptFragment">
+    tools:context="com.example.bervianto.ecceg_rsa_app.fragment.ECCEGEncryptFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,6 +49,17 @@
                 android:hint="p" />
         </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/k_encrypt_ecceg_value"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:hint="k" />
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/public_key_loc_ecceg_layout"
