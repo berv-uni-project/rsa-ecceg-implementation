@@ -26,7 +26,7 @@ dependencies {
     implementation 'com.github.medyo:fancybuttons:1.9.0'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.1.11'
     implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:support-v4:28.0.0'
     implementation 'cc.cloudist.acplibrary:library:1.2.1'
     implementation 'gun0912.ted:tedpermission:2.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
