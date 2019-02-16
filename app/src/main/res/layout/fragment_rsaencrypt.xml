@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     tools:context="com.example.bervianto.ecceg_rsa_app.fragment.RSAEncryptFragment">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp">
-        <android.support.design.widget.TextInputLayout
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_n_key"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,14 +22,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/n_value_encrypt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Modulus N" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,13 +40,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/public_key_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Public Key" />
 
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/textView3"
@@ -81,7 +82,7 @@
             fancy:fb_text="Search Public Key"
             fancy:fb_textColor="#FFFFFF" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/file_encrypt_open"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,13 +94,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/open_public_button">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/file_encrypt_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:hint="File to Encrypt" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <mehdi.sakout.fancybuttons.FancyButton
             android:id="@+id/select_encrypt_file_button"
@@ -120,7 +121,7 @@
             fancy:fb_text="Select File"
             fancy:fb_textColor="#FFFFFF" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/file_encrypt_loc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -132,12 +133,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/select_encrypt_file_button">
 
-            <android.support.design.widget.TextInputEditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/file_encrypt_loc_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Encrypt File Name" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <mehdi.sakout.fancybuttons.FancyButton
             android:id="@+id/encrypt_button"
@@ -158,7 +159,7 @@
             fancy:fb_text="Encrypt"
             fancy:fb_textColor="#FFFFFF" />
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/outputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -169,15 +170,16 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/inputSizeLayout">
-        <android.support.design.widget.TextInputEditText
+
+            <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/outputValue"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:enabled="false"
             android:hint="Output" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -188,15 +190,16 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/encrypt_button">
-            <android.support.design.widget.TextInputEditText
+
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/InputValue"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:enabled="false"
                 android:hint="Input" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputSizeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -207,15 +210,16 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/inputLayout">
-            <android.support.design.widget.TextInputEditText
+
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/InputSizeValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:hint="Input Size (in bytes)" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/outputSizeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -227,15 +231,16 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/outputLayout">
-            <android.support.design.widget.TextInputEditText
+
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/outputSizeValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:hint="Output Size (in bytes)" />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/timeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -248,12 +253,13 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/outputSizeLayout">
-            <android.support.design.widget.TextInputEditText
+
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/timeValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:hint="Time Elapsed (ms)" />
-        </android.support.design.widget.TextInputLayout>
-    </android.support.constraint.ConstraintLayout>
+        </com.google.android.material.textfield.TextInputLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

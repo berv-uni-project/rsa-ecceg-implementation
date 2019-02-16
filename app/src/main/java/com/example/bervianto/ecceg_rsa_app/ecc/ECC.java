@@ -6,7 +6,7 @@ public class ECC {
     public BigInteger a, b, p; // y = x^3 + ax + b mod p
     public BigInteger k = BIG_ZERO;
     private static final BigInteger BIG_ZERO = BigInteger.ZERO, BIG_ONE = BigInteger.valueOf(1),
-        BIG_TWO = BigInteger.valueOf(2);
+            BIG_TWO = BigInteger.valueOf(2);
 
     public ECC() {
         this.a = BIG_ZERO;
@@ -14,7 +14,7 @@ public class ECC {
         this.p = BIG_ZERO; // p is a prime
     }
 
-    public Point doubled(Point a) {
+    private Point doubled(Point a) {
         BigInteger tigaXkuadrat = BigInteger.valueOf(3).multiply(a.x).multiply(a.x);
         BigInteger duaY = BigInteger.valueOf(2).multiply(a.y);
         BigInteger inverseDuaY = duaY.modInverse(this.p);
@@ -28,7 +28,7 @@ public class ECC {
         return point;
     }
 
-    public Point add(Point p, Point q) {
+    Point add(Point p, Point q) {
         if (p.infinity && q.infinity) {
             Point point = new Point();
             point.infinity = true;
@@ -51,20 +51,18 @@ public class ECC {
         return point;
     }
 
-    public Point multiplyGenap(BigInteger n, Point p) { // rekursif, n diharapkan genap, n tidak 0
+    private Point multiplyGenap(BigInteger n, Point p) { // rekursif, n diharapkan genap, n tidak 0
         // System.out.println(n);
         if (n.equals(BIG_ONE)) { // basis
             // System.out.println("cek1");
             return p;
-        }
-        else if (n.mod(BIG_TWO).equals(BIG_ZERO)) { // rekurens
+        } else if (n.mod(BIG_TWO).equals(BIG_ZERO)) { // rekurens
             // System.out.println("cek2");
             return multiplyGenap(n.divide(BIG_TWO), doubled(p));
-        }
-        else return multiplyGanjil(n, p);
+        } else return multiplyGanjil(n, p);
     }
 
-    public Point multiplyGanjil(BigInteger n, Point p) { // rekursif, n ganjil tidak 0
+    private Point multiplyGanjil(BigInteger n, Point p) { // rekursif, n ganjil tidak 0
         // System.out.println(n);
         if (n.equals(BIG_ONE)) // basis
             return p;
@@ -74,7 +72,7 @@ public class ECC {
         }
     }
 
-    public Point multiply(BigInteger n, Point p) {
+    Point multiply(BigInteger n, Point p) {
         if (n.equals(BIG_ZERO))
             return new Point();
         else if (n.mod(BIG_TWO).equals(BIG_ZERO)) // rekurens
@@ -82,14 +80,14 @@ public class ECC {
         else return multiplyGanjil(n, p);
     }
 
-    public BigInteger cariY(BigInteger x) {
+    private BigInteger cariY(BigInteger x) {
         BigInteger xPangkatTiga = x.multiply(x).multiply(x);
         BigInteger axPlusb = this.a.multiply(x).add(b);
         BigInteger y2 = xPangkatTiga.add(axPlusb).mod(p);
         return sqrtP(y2, p);
     }
 
-    public Point intToPoint(BigInteger m) {
+    Point intToPoint(BigInteger m) {
         BigInteger mk = m.multiply(k);
         for (BigInteger i = BIG_ONE; i.compareTo(k) < 0; i = i.add(BIG_ONE)) {
             BigInteger x = mk.add(i);
@@ -155,7 +153,7 @@ public class ECC {
         return partOne.multiply(partTwo).mod(p);
     }
 
-    public BigInteger sqrtP(BigInteger x, BigInteger p) {
+    private BigInteger sqrtP(BigInteger x, BigInteger p) {
         if (p.mod(BIG_TWO).equals(BIG_ZERO))
             return null;
         BigInteger q = p.subtract(BIG_ONE).divide(BIG_TWO);
@@ -185,5 +183,5 @@ public class ECC {
         point1 = ecc.multiply(n, point1);
         System.out.println(point1.toString());
     }
-    
+
 }

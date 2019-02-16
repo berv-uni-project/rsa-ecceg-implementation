@@ -20,10 +20,8 @@ public class FileUtils {
             return null;
         }
 
-        FileInputStream in = null;
         byte[] bytes = null;
-        try {
-            in = new FileInputStream(fIn);
+        try (FileInputStream in = new FileInputStream(fIn)) {
 
             long fileSize = fIn.length();
             if (fileSize > Integer.MAX_VALUE) {
@@ -33,17 +31,11 @@ public class FileUtils {
             bytes = new byte[(int) fileSize];
 
             int offset = 0;
-            int numRead = 0;
+            int numRead;
             while (offset < bytes.length && (numRead = in.read(bytes, offset, bytes.length - offset)) >= 0) {
                 offset += numRead;
             }
-        } catch (IOException e) {
-        } finally {
-            try {
-                if (in != null)
-                    in.close();
-            } catch (IOException e) {
-            }
+        } catch (IOException ignored) {
         }
 
         return bytes;
@@ -55,44 +47,40 @@ public class FileUtils {
             FileOutputStream fos = new FileOutputStream(stringpath);
             fos.write(content);
             fos.close();
-        } catch (IOException e) {}
+        } catch (IOException ignored) {
+        }
     }
 
-    public static byte[] intToBytes(int x) {
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-        buffer.putInt(x);
-        return buffer.array();
+    private static byte[] intToBytes(int x) {
+        return ByteBuffer.allocate(4).putInt(x).array();
     }
 
-    public static int bytesToInt(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES);
-        buffer.put(bytes);
-        buffer.flip();//need flip
-        return buffer.getInt();
+    private static int bytesToInt(byte[] bytes) {
+        return ByteBuffer.wrap(bytes).getInt();
     }
 
-    public static void savePointsToFile(String path, List<Pair<Point,Point>> pairpoints) {
+    public static void savePointsToFile(String path, List<Pair<Point, Point>> pairpoints) {
         byte[] b = new byte[pairpoints.size() * 16];
         int j = 0;
-        for (Pair<Point,Point> ppoint : pairpoints) {
+        for (Pair<Point, Point> ppoint : pairpoints) {
             byte[] btemp = intToBytes(ppoint.left.x.intValue());
-            for (int i = 0; i < btemp.length; i++) {
-                b[j] = btemp[i];
+            for (byte aBtemp : btemp) {
+                b[j] = aBtemp;
                 j++;
             }
             btemp = intToBytes(ppoint.left.y.intValue());
-            for (int i = 0; i < btemp.length; i++) {
-                b[j] = btemp[i];
+            for (byte aBtemp : btemp) {
+                b[j] = aBtemp;
                 j++;
             }
             btemp = intToBytes(ppoint.right.x.intValue());
-            for (int i = 0; i < btemp.length; i++) {
-                b[j] = btemp[i];
+            for (byte aBtemp : btemp) {
+                b[j] = aBtemp;
                 j++;
             }
             btemp = intToBytes(ppoint.right.y.intValue());
-            for (int i = 0; i < btemp.length; i++) {
-                b[j] = btemp[i];
+            for (byte aBtemp : btemp) {
+                b[j] = aBtemp;
                 j++;
             }
         }
@@ -122,9 +110,9 @@ public class FileUtils {
     }
 
 
-    public static List<Pair<Point,Point>> loadPointsFromFile(String stringpath) {
+    public static List<Pair<Point, Point>> loadPointsFromFile(String stringpath) {
         byte[] rawData = getBytes(stringpath);
-        List<Pair<Point,Point>> pair = new ArrayList<>();
+        List<Pair<Point, Point>> pair = new ArrayList<>();
         byte[] btemp = new byte[4];
         int f = 0, s;
         Point point1 = new Point();
@@ -133,7 +121,7 @@ public class FileUtils {
         Point point2 = new Point();
         point2.x = BigInteger.valueOf(1);
         point2.y = BigInteger.valueOf(1);
-        for (int i = 0; i < rawData.length; i++) {
+        for (int i = 0; i < (rawData != null ? rawData.length : 0); i++) {
             btemp[i % 4] = rawData[i];
             if (i % 4 == 3) {
                 if ((i / 4) % 4 == 0) {
@@ -153,7 +141,7 @@ public class FileUtils {
                     point2 = new Point();
                     point2.x = BigInteger.valueOf(f);
                     point2.y = BigInteger.valueOf(s);
-                    pair.add(new Pair<Point,Point>(point1, point2));
+                    pair.add(new Pair<>(point1, point2));
                 }
             }
         }

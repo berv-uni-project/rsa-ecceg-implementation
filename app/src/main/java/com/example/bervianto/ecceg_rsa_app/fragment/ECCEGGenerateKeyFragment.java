@@ -1,11 +1,8 @@
 package com.example.bervianto.ecceg_rsa_app.fragment;
 
-import android.Manifest;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +11,15 @@ import android.widget.Toast;
 import com.example.bervianto.ecceg_rsa_app.R;
 import com.example.bervianto.ecceg_rsa_app.ecc.ECC;
 import com.example.bervianto.ecceg_rsa_app.ecc.ECCEGMain;
-import com.example.bervianto.ecceg_rsa_app.rsa.RSA;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -31,18 +28,18 @@ import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class ECCEGGenerateKeyFragment extends Fragment {
 
-    @BindView(R.id.eccegA)
-    TextInputEditText a;
-    @BindView(R.id.eccegB)
-    TextInputEditText b;
-    @BindView(R.id.eccegP)
-    TextInputEditText p;
-    @BindView(R.id.eccegPrivatePath)
-    TextInputEditText pri;
-    @BindView(R.id.eccegPubPath)
-    TextInputEditText pub;
 
-    ACProgressFlower loadingView;
+    @BindView(R.id.eccegA)
+    protected TextInputEditText a;
+    @BindView(R.id.eccegB)
+    protected TextInputEditText b;
+    @BindView(R.id.eccegP)
+    protected TextInputEditText p;
+    @BindView(R.id.eccegPrivatePath)
+    protected TextInputEditText pri;
+    @BindView(R.id.eccegPubPath)
+    protected TextInputEditText pub;
+    private ACProgressFlower loadingView;
 
     public ECCEGGenerateKeyFragment() {
         // Required empty public constructor
@@ -58,7 +55,7 @@ public class ECCEGGenerateKeyFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_ecceggenerate_key, container, false);
@@ -71,11 +68,11 @@ public class ECCEGGenerateKeyFragment extends Fragment {
 
     @OnClick(R.id.generate_key_ecceg)
     void generateKeyECCEG() {
-        if (!a.getText().toString().equalsIgnoreCase("") &&
-                !b.getText().toString().equalsIgnoreCase("") &&
-                !p.getText().toString().equalsIgnoreCase("") &&
-                !pub.getText().toString().equalsIgnoreCase("") &&
-                !pri.getText().toString().equalsIgnoreCase("")) {
+        if (!Objects.requireNonNull(a.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(b.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(p.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(pub.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(pri.getText()).toString().equalsIgnoreCase("")) {
             loadingView.show();
             new ECCEGGenerateKeyFragment.GenerateKey(ECCEGGenerateKeyFragment.this).execute(
                     a.getText().toString(),

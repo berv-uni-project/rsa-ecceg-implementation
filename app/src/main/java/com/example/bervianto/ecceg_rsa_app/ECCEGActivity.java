@@ -1,20 +1,21 @@
 package com.example.bervianto.ecceg_rsa_app;
 
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.example.bervianto.ecceg_rsa_app.adapter.ECCEGPagerAdapter;
-import com.example.bervianto.ecceg_rsa_app.adapter.RSAPagerAdapter;
+import com.google.android.material.tabs.TabLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class ECCEGActivity extends AppCompatActivity {
 
     @BindView(R.id.container_ecceg)
-    ViewPager mViewPager;
+    protected ViewPager mViewPager;
+    @BindView(R.id.tabs_ecceg)
+    protected TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,6 @@ public class ECCEGActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         ECCEGPagerAdapter mSectionsPagerAdapter = new ECCEGPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        TabLayout tabLayout = findViewById(R.id.tabs_ecceg);
         tabLayout.setupWithViewPager(mViewPager);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.bervianto.ecceg_rsa_app.ecc;
 
-public class Pair<L,R> {
+import androidx.annotation.NonNull;
+
+public class Pair<L, R> {
     public L left;
     public R right;
 
@@ -10,7 +12,9 @@ public class Pair<L,R> {
     }
 
     @Override
-    public int hashCode() { return left.hashCode() ^ right.hashCode(); }
+    public int hashCode() {
+        return left.hashCode() ^ right.hashCode();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -19,6 +23,7 @@ public class Pair<L,R> {
         return left.equals(pair.left) && right.equals(pair.right);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "<" + left.toString() + ", " + right.toString() + ">";

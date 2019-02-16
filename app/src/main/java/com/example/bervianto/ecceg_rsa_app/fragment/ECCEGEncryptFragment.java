@@ -4,8 +4,6 @@ package com.example.bervianto.ecceg_rsa_app.fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +16,17 @@ import com.example.bervianto.ecceg_rsa_app.ecc.Pair;
 import com.example.bervianto.ecceg_rsa_app.ecc.Point;
 import com.example.bervianto.ecceg_rsa_app.rsa.RSA;
 import com.example.bervianto.ecceg_rsa_app.utils.FileUtils;
+import com.google.android.material.textfield.TextInputEditText;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -40,37 +42,37 @@ import static android.os.Environment.getExternalStorageDirectory;
 public class ECCEGEncryptFragment extends Fragment {
 
     @BindView(R.id.public_key_loc_ecceg_value)
-    TextInputEditText publicKeyLoc;
+    protected TextInputEditText publicKeyLoc;
 
     @BindView(R.id.plain_text_loc_value_ecceg)
-    TextInputEditText plainTextLoc;
+    protected TextInputEditText plainTextLoc;
 
     @BindView(R.id.cipher_text_loc_ecceg)
-    TextInputEditText cipherTextLoc;
+    protected TextInputEditText cipherTextLoc;
 
     @BindView(R.id.input_file_encrypt_ecceg)
-    TextInputEditText inputContent;
+    protected TextInputEditText inputContent;
 
     @BindView(R.id.output_file_encrypt_ecceg)
-    TextInputEditText outputContent;
+    protected TextInputEditText outputContent;
 
     @BindView(R.id.input_file_size_encrypt_ecceg)
-    TextInputEditText inputSize;
+    protected TextInputEditText inputSize;
 
     @BindView(R.id.output_file_size_encrypt_ecceg)
-    TextInputEditText outputSize;
+    protected TextInputEditText outputSize;
 
     @BindView(R.id.time_encrypt_ecceg)
-    TextInputEditText timeElapsed;
+    protected TextInputEditText timeElapsed;
 
     @BindView(R.id.a_encrypt_ecceg_value)
-    TextInputEditText a;
+    protected TextInputEditText a;
 
     @BindView(R.id.b_encrypt_ecceg_value)
-    TextInputEditText b;
+    protected TextInputEditText b;
 
     @BindView(R.id.p_encrypt_ecceg_value)
-    TextInputEditText p;
+    protected TextInputEditText p;
 
     private ACProgressFlower loadingView;
     private long startTime;
@@ -81,12 +83,11 @@ public class ECCEGEncryptFragment extends Fragment {
     }
 
     public static ECCEGEncryptFragment newInstance() {
-        ECCEGEncryptFragment fragment = new ECCEGEncryptFragment();
-        return fragment;
+        return new ECCEGEncryptFragment();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_eccegencrypt, container, false);
@@ -99,12 +100,12 @@ public class ECCEGEncryptFragment extends Fragment {
 
     @OnClick(R.id.encrypt_button_ecceg)
     void encrypt() {
-        if (!publicKeyLoc.getText().toString().equalsIgnoreCase("") &&
-                !plainTextLoc.getText().toString().equalsIgnoreCase("") &&
-                !cipherTextLoc.getText().toString().equalsIgnoreCase("") &&
-                !a.getText().toString().equalsIgnoreCase("") &&
-                !b.getText().toString().equalsIgnoreCase("") &&
-                !p.getText().toString().equalsIgnoreCase("")) {
+        if (!Objects.requireNonNull(publicKeyLoc.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(plainTextLoc.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(cipherTextLoc.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(a.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(b.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(p.getText()).toString().equalsIgnoreCase("")) {
             File file = Environment.getExternalStorageDirectory();
             File location = new File(file, "ECCEG/");
             if (!location.exists()) {
@@ -118,7 +119,7 @@ public class ECCEGEncryptFragment extends Fragment {
                     publicKeyLoc.getText().toString(),
                     plainTextLoc.getText().toString(),
                     cipherLoc
-                    );
+            );
         }
     }
 
@@ -128,12 +129,7 @@ public class ECCEGEncryptFragment extends Fragment {
                 .withFilter(false, false, "pub")
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        publicKeyLoc.setText(pathFile.getPath());
-                    }
-                })
+                .withChosenListener((path, pathFile) -> publicKeyLoc.setText(pathFile.getPath()))
                 .build()
                 .show();
     }
@@ -143,14 +139,11 @@ public class ECCEGEncryptFragment extends Fragment {
         new ChooserDialog().with(getActivity())
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        plainTextLoc.setText(pathFile.getPath());
-                        inputSize.setText(String.valueOf(pathFile.length()));
-                        loadingView.show();
-                        new ECCEGEncryptFragment.SetInput(ECCEGEncryptFragment.this).execute(pathFile.getPath());
-                    }
+                .withChosenListener((path, pathFile) -> {
+                    plainTextLoc.setText(pathFile.getPath());
+                    inputSize.setText(String.valueOf(pathFile.length()));
+                    loadingView.show();
+                    new SetInput(ECCEGEncryptFragment.this).execute(pathFile.getPath());
                 })
                 .build()
                 .show();
@@ -158,11 +151,9 @@ public class ECCEGEncryptFragment extends Fragment {
 
     private class Encrypt extends AsyncTask<String, Integer, String> {
 
-        private WeakReference<ECCEGEncryptFragment> activityReference;
-
         // only retain a weak reference to the activity
         Encrypt(ECCEGEncryptFragment context) {
-            activityReference = new WeakReference<>(context);
+            new WeakReference<>(context);
         }
 
         @Override
@@ -177,7 +168,7 @@ public class ECCEGEncryptFragment extends Fragment {
                 ECCEG ecceg = new ECCEG(ecc, ecc.getBasePoint());
                 ecceg.loadPublicKey(strings[3]);
                 byte[] read = FileUtils.getBytes(strings[4]);
-                List<Pair<Point,Point>> enc = ecceg.encryptBytes(read);
+                List<Pair<Point, Point>> enc = ecceg.encryptBytes(read);
                 FileUtils.savePointsToFile(strings[5], enc);
                 endTime = System.currentTimeMillis();
                 return FileUtils.showHexFromFile(strings[5]);
@@ -188,22 +179,20 @@ public class ECCEGEncryptFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String hex) {
-            timeElapsed.setText(String.valueOf(endTime-startTime));
+            timeElapsed.setText(String.valueOf(endTime - startTime));
             outputContent.setText(hex);
-            File file = new File(Environment.getExternalStorageDirectory().getPath()+"/ECCEG/"+cipherTextLoc.getText().toString());
+            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/ECCEG/" + Objects.requireNonNull(cipherTextLoc.getText()).toString());
             outputSize.setText(String.valueOf(file.length()));
             loadingView.dismiss();
-            Toast.makeText(getActivity(),"Finished Encrypt",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Finished Encrypt", Toast.LENGTH_SHORT).show();
         }
     }
 
     private class SetInput extends AsyncTask<String, Integer, String> {
 
-        private WeakReference<ECCEGEncryptFragment> activityReference;
-
         // only retain a weak reference to the activity
         SetInput(ECCEGEncryptFragment context) {
-            activityReference = new WeakReference<>(context);
+            new WeakReference<>(context);
         }
 
         @Override

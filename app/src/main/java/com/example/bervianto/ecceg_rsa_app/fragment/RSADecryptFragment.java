@@ -3,8 +3,6 @@ package com.example.bervianto.ecceg_rsa_app.fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +10,16 @@ import android.widget.Toast;
 
 import com.example.bervianto.ecceg_rsa_app.R;
 import com.example.bervianto.ecceg_rsa_app.rsa.RSA;
+import com.google.android.material.textfield.TextInputEditText;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
+import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -29,32 +31,23 @@ import static android.os.Environment.getExternalStorageDirectory;
 public class RSADecryptFragment extends Fragment {
 
     @BindView(R.id.private_key_value)
-    TextInputEditText privateKey;
-
+    protected TextInputEditText privateKey;
     @BindView(R.id.n_value_decrypt)
-    TextInputEditText nModulus;
-
+    protected TextInputEditText nModulus;
     @BindView(R.id.file_decrypt_value)
-    TextInputEditText decryptFileLoc;
-
+    protected TextInputEditText decryptFileLoc;
     @BindView(R.id.file_decrypt_loc_value)
-    TextInputEditText decryptDestination;
-
+    protected TextInputEditText decryptDestination;
     @BindView(R.id.outputValueDecrypt)
-    TextInputEditText outputValue;
-
+    protected TextInputEditText outputValue;
     @BindView(R.id.InputValueDecrypt)
-    TextInputEditText inputValue;
-
+    protected TextInputEditText inputValue;
     @BindView(R.id.outputSizeValueDecrypt)
-    TextInputEditText outputSize;
-
+    protected TextInputEditText outputSize;
     @BindView(R.id.InputSizeValueDecrypt)
-    TextInputEditText inputSize;
-
+    protected TextInputEditText inputSize;
     @BindView(R.id.timeValueDecrypt)
-    TextInputEditText timeElapsedDecrypt;
-
+    protected TextInputEditText timeElapsedDecrypt;
     private String keyPath;
     private ACProgressFlower loadingView;
     private long startTime;
@@ -68,7 +61,7 @@ public class RSADecryptFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_rsadecrypt, container, false);
@@ -85,13 +78,10 @@ public class RSADecryptFragment extends Fragment {
                 .withFilter(false, false, "pri")
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        keyPath = pathFile.getPath();
-                        loadingView.show();
-                        new RSADecryptFragment.OpenKey(RSADecryptFragment.this).execute(keyPath);
-                    }
+                .withChosenListener((path, pathFile) -> {
+                    keyPath = pathFile.getPath();
+                    loadingView.show();
+                    new OpenKey(RSADecryptFragment.this).execute(keyPath);
                 })
                 .build()
                 .show();
@@ -102,14 +92,11 @@ public class RSADecryptFragment extends Fragment {
         new ChooserDialog().with(getActivity())
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener(new ChooserDialog.Result() {
-                    @Override
-                    public void onChoosePath(String path, File pathFile) {
-                        decryptFileLoc.setText(pathFile.getPath());
-                        inputSize.setText(String.valueOf(pathFile.length()));
-                        loadingView.show();
-                        new RSADecryptFragment.SetInput(RSADecryptFragment.this).execute(pathFile.getPath());
-                    }
+                .withChosenListener((path, pathFile) -> {
+                    decryptFileLoc.setText(pathFile.getPath());
+                    inputSize.setText(String.valueOf(pathFile.length()));
+                    loadingView.show();
+                    new SetInput(RSADecryptFragment.this).execute(pathFile.getPath());
                 })
                 .build()
                 .show();
@@ -117,18 +104,18 @@ public class RSADecryptFragment extends Fragment {
 
     @OnClick(R.id.decrypt_button)
     void decrypt() {
-        if (!decryptFileLoc.getText().toString().equalsIgnoreCase("") &&
-                !decryptDestination.getText().toString().equalsIgnoreCase("") &&
-                !nModulus.getText().toString().equalsIgnoreCase("")
-                && !privateKey.getText().toString().equalsIgnoreCase("")) {
+        if (!Objects.requireNonNull(decryptFileLoc.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(decryptDestination.getText()).toString().equalsIgnoreCase("") &&
+                !Objects.requireNonNull(nModulus.getText()).toString().equalsIgnoreCase("")
+                && !Objects.requireNonNull(privateKey.getText()).toString().equalsIgnoreCase("")) {
             loadingView.show();
             File file = Environment.getExternalStorageDirectory();
-            File location = new File(file,"RSA/");
+            File location = new File(file, "RSA/");
             if (!location.exists()) {
                 location.mkdir();
             }
             new RSADecryptFragment.Decrypt(RSADecryptFragment.this).execute(decryptFileLoc.getText().toString(),
-                    location.getAbsolutePath()+"/"+decryptDestination.getText().toString(),
+                    location.getAbsolutePath() + "/" + decryptDestination.getText().toString(),
                     nModulus.getText().toString(),
                     privateKey.getText().toString());
         }
@@ -136,17 +123,15 @@ public class RSADecryptFragment extends Fragment {
 
     private class Decrypt extends AsyncTask<String, Integer, String> {
 
-        private WeakReference<RSADecryptFragment> activityReference;
-
         // only retain a weak reference to the activity
         Decrypt(RSADecryptFragment context) {
-            activityReference = new WeakReference<>(context);
+            new WeakReference<>(context);
         }
 
         @Override
         protected String doInBackground(String... strings) {
             startTime = System.currentTimeMillis();
-            RSA.decryptFile(strings[0],strings[1],new BigInteger(strings[3]), new BigInteger(strings[2]));
+            RSA.decryptFile(strings[0], strings[1], new BigInteger(strings[3]), new BigInteger(strings[2]));
             byte[] bytes = RSA.getBytes(strings[1]);
             if (bytes != null)
                 return new String(bytes);
@@ -157,22 +142,20 @@ public class RSADecryptFragment extends Fragment {
         @Override
         protected void onPostExecute(String hex) {
             long endTime = System.currentTimeMillis();
-            timeElapsedDecrypt.setText(String.valueOf(endTime-startTime));
+            timeElapsedDecrypt.setText(String.valueOf(endTime - startTime));
             outputValue.setText(hex);
-            File file = new File(Environment.getExternalStorageDirectory().getPath()+"/RSA/"+decryptDestination.getText().toString());
+            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/RSA/" + decryptDestination.getText().toString());
             outputSize.setText(String.valueOf(file.length()));
             loadingView.dismiss();
-            Toast.makeText(getActivity(),"Finished Decrypt", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Finished Decrypt", Toast.LENGTH_SHORT).show();
         }
     }
 
     private class OpenKey extends AsyncTask<String, Integer, String> {
 
-        private WeakReference<RSADecryptFragment> activityReference;
-
         // only retain a weak reference to the activity
         OpenKey(RSADecryptFragment context) {
-            activityReference = new WeakReference<>(context);
+            new WeakReference<>(context);
         }
 
         @Override
@@ -193,11 +176,9 @@ public class RSADecryptFragment extends Fragment {
 
     private class SetInput extends AsyncTask<String, Integer, String> {
 
-        private WeakReference<RSADecryptFragment> activityReference;
-
         // only retain a weak reference to the activity
         SetInput(RSADecryptFragment context) {
-            activityReference = new WeakReference<>(context);
+            new WeakReference<>(context);
         }
 
         @Override

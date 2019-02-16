@@ -1,9 +1,13 @@
 package com.example.bervianto.ecceg_rsa_app.ecc;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
-import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 public class ECCEG {
     private Point publicKey;
@@ -93,8 +97,7 @@ public class ECCEG {
 
     public List<Pair<Point, Point>> encryptBytes(byte[] bytes) {
         List<Pair<Point, Point>> ret = new ArrayList<>();
-        for (int i = 0; i < bytes.length; ++i)
-            ret.add(encrypt(ECC.intToPoint(BigInteger.valueOf(bytes[i]))));
+        for (byte aByte : bytes) ret.add(encrypt(ECC.intToPoint(BigInteger.valueOf(aByte))));
         return ret;
     }
 
