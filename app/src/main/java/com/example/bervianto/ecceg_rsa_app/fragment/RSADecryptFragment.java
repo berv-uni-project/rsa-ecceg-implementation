@@ -74,7 +74,7 @@ public class RSADecryptFragment extends Fragment {
 
     @OnClick(R.id.open_private_button)
     void openPrivateKey() {
-        new ChooserDialog().with(getActivity())
+        new ChooserDialog(getActivity())
                 .withFilter(false, false, "pri")
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
@@ -89,7 +89,7 @@ public class RSADecryptFragment extends Fragment {
 
     @OnClick(R.id.select_decrypt_file_button)
     void openFileDecrypt() {
-        new ChooserDialog().with(getActivity())
+        new ChooserDialog(getActivity())
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
                 .withChosenListener((path, pathFile) -> {
