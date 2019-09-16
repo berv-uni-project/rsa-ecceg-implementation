@@ -33,7 +33,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'cc.cloudist.acplibrary:library:1.2.1'
     implementation 'gun0912.ted:tedpermission:2.2.2'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
