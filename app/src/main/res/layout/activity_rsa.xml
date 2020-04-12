@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.bervianto.ecceg_rsa_app.RSAActivity">
+    tools:context="id.my.berviantoleo.ecceg_rsa_app.RSAActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
