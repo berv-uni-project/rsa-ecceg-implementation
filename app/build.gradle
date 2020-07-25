@@ -30,7 +30,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.2.1'
     implementation 'com.github.medyo:fancybuttons:1.9.1'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0-alpha01'
+    implementation 'com.google.android.material:material:1.3.0-alpha02'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'cc.cloudist.acplibrary:library:1.2.1'
     implementation 'gun0912.ted:tedpermission:2.2.3'
