@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "876213334140",
+    "firebase_url": "https://final-project-877fd.firebaseio.com",
+    "project_id": "final-project-877fd",
+    "storage_bucket": "final-project-877fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:876213334140:android:134eb67add86606af619f9",
+        "android_client_info": {
+          "package_name": "id.my.berviantoleo.ecceg_rsa_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "876213334140-t9bpfbs9osbs1e6d1c5gb57ul8kup055.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7dBoZ0k14rvYcqJ8VLFZZ696HdxrI_rM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "876213334140-36m0df4qo86th20d5du62hf754kgromv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:876213334140:android:e3190821fca00f0b",
+        "android_client_info": {
+          "package_name": "me.berviantoleo.audiowatermarking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "876213334140-mlqnl6k0g0e8938plsj6iadi4tpb54hr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.berviantoleo.audiowatermarking",
+            "certificate_hash": "057f0dd1ab0dbc035b065338615da2ef27da4508"
+          }
+        },
+        {
+          "client_id": "876213334140-t9bpfbs9osbs1e6d1c5gb57ul8kup055.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7dBoZ0k14rvYcqJ8VLFZZ696HdxrI_rM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "876213334140-36m0df4qo86th20d5du62hf754kgromv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
