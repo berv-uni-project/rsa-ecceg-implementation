@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/StudioProjects-rsa-ecceg-implementation.iml" filepath="$PROJECT_DIR$/StudioProjects-rsa-ecceg-implementation.iml" group="rsa-ecceg-implementation" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/rsa-ecceg-implementation.iml" filepath="$PROJECT_DIR$/rsa-ecceg-implementation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/rsa-ecceg-implementation-app.iml" filepath="$PROJECT_DIR$/app/rsa-ecceg-implementation-app.iml" group="rsa-ecceg-implementation/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StudioProjects.rsa-ecceg-implementation.iml" filepath="$PROJECT_DIR$/.idea/modules/StudioProjects.rsa-ecceg-implementation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/rsa-ecceg-implementation.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/rsa-ecceg-implementation.app.iml" />
     </modules>
   </component>
 </project>
