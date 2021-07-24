@@ -88,7 +88,7 @@ public class RSAGenerateKeyFragment extends Fragment {
                 && !Objects.requireNonNull(privateLocation.getText()).toString().equalsIgnoreCase("")
                 && !Objects.requireNonNull(publicLocation.getText()).toString().equalsIgnoreCase("")) {
             if (Integer.valueOf(byteSize.getText().toString()) >= 1024) {
-                TedPermission.with(Objects.requireNonNull(getContext()))
+                TedPermission.with(requireContext())
                         .setPermissionListener(extract)
                         .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
                         .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
