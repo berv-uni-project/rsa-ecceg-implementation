@@ -35,7 +35,7 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.2.3'
     implementation 'com.github.medyo:fancybuttons:1.9.1'
     implementation 'com.google.android.material:material:1.5.0'
-    implementation 'com.google.firebase:firebase-crashlytics:18.2.8'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.9'
     implementation 'com.google.firebase:firebase-analytics:20.1.0'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.2.0'
     implementation 'gun0912.ted:tedpermission:2.2.3'
