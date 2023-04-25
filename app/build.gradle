@@ -4,6 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    namespace "id.my.berviantoleo.ecceg_rsa_app"
     compileSdkVersion 33
     defaultConfig {
         applicationId "id.my.berviantoleo.ecceg_rsa_app"
