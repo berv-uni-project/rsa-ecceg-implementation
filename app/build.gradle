@@ -36,7 +36,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.jakewharton:butterknife:10.2.3'
     implementation 'com.github.medyo:fancybuttons:1.9.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.firebase:firebase-crashlytics:18.3.6'
     implementation 'com.google.firebase:firebase-analytics:21.2.2'
     implementation 'com.obsez.android.lib.filechooser:filechooser:1.2.0'
