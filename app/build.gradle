@@ -4,7 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
     defaultConfig {
         applicationId "id.my.berviantoleo.ecceg_rsa_app"
         minSdkVersion 19
@@ -15,8 +15,8 @@ android {
         multiDexEnabled true
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility 17
+        targetCompatibility 17
     }
     buildTypes {
         release {
