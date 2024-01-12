@@ -31,7 +31,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.core:core-ktx:1.10.1"
+    implementation "androidx.core:core-ktx:1.12.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'cc.cloudist.acplibrary:library:1.2.1'
     implementation 'com.android.support:multidex:1.0.3'
