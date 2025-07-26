@@ -1,313 +1,337 @@
-package id.my.berviantoleo.ecceg_rsa_app.lib.rsa;
+package id.my.berviantoleo.ecceg_rsa_app.lib.rsa
 
-import android.util.Log;
+import android.util.Log
+import java.io.BufferedOutputStream
+import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.FileReader
+import java.io.IOException
+import java.io.OutputStreamWriter
+import java.math.BigInteger
+import java.security.SecureRandom
+import java.util.Random
+import kotlin.math.ceil
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Random;
-
-public class RSA {
-
+object RSA {
     /**
      * Returns true when the argument is null.
      */
-    private static boolean isNull(Object obj) {
-        return obj == null;
+    private fun isNull(obj: Any?): Boolean {
+        return obj == null
     }
 
-    public static void generateKey(int bitLength, String privateName, String publicName) {
-        SecureRandom rnd = new SecureRandom();
-        BigInteger p = BigInteger.probablePrime(75 * bitLength / 100, rnd);
-        BigInteger q = BigInteger.probablePrime(25 * bitLength / 100, rnd);
-        BigInteger n = p.multiply(q);
-        BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
-        BigInteger i;
-        BigInteger pubExp = BigInteger.ONE;
-        for (i = BigInteger.probablePrime(bitLength / 10, rnd); i.compareTo(n) < 0; i = i.nextProbablePrime()) {
-            if (i.gcd(phi).equals(BigInteger.ONE)) {
-                pubExp = i;
-                break;
+    fun generateKey(bitLength: Int, privateName: String?, publicName: String?) {
+        val rnd = SecureRandom()
+        val p = BigInteger.probablePrime(75 * bitLength / 100, rnd)
+        val q = BigInteger.probablePrime(25 * bitLength / 100, rnd)
+        val n = p.multiply(q)
+        val phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE))
+        var i: BigInteger
+        var pubExp = BigInteger.ONE
+        i = BigInteger.probablePrime(bitLength / 10, rnd)
+        while (i.compareTo(n) < 0) {
+            if (i.gcd(phi) == BigInteger.ONE) {
+                pubExp = i
+                break
             }
+            i = i.nextProbablePrime()
         }
-        BigInteger priExp = pubExp.modInverse(phi);
-        writeKeyToFile(privateName, n, priExp);
-        writeKeyToFile(publicName, n, pubExp);
+        val priExp = pubExp.modInverse(phi)
+        writeKeyToFile(privateName, n, priExp)
+        writeKeyToFile(publicName, n, pubExp)
     }
 
-    private static final String HEXES = "0123456789ABCDEF";
+    private const val HEXES = "0123456789ABCDEF"
 
-    public static String showHexFromFile(String file) {
-        byte[] sourceBytes = getBytes(file);
+    @JvmStatic
+    fun showHexFromFile(file: String): String {
+        val sourceBytes = getBytes(file)
         if (isNull(sourceBytes)) {
-            return "";
+            return ""
         }
-        return getHex(sourceBytes);
+        return RSA.getHex(sourceBytes!!)
     }
 
-    private static String getHex(byte[] raw) {
-        final StringBuilder hex = new StringBuilder(2 * raw.length);
-        for (final byte b : raw) {
-            hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+    private fun getHex(raw: ByteArray): String {
+        val hex = StringBuilder(2 * raw.size)
+        for (b in raw) {
+            hex.append(HEXES.get((b.toInt() and 0xF0) shr 4))
+                .append(HEXES.get((b.toInt() and 0x0F)))
         }
-        return hex.toString();
+        return hex.toString()
     }
 
-    private static void writeKeyToFile(String name, BigInteger n, BigInteger d) {
-        String output = n.toString() + ":" + d.toString();
+    private fun writeKeyToFile(name: String?, n: BigInteger, d: BigInteger) {
+        val output = n.toString() + ":" + d.toString()
         try {
-            FileOutputStream writer = new FileOutputStream(name);
-            OutputStreamWriter outWriter = new OutputStreamWriter(writer);
-            outWriter.write(output);
-            outWriter.close();
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            Log.e("RSA", e.getMessage());
+            val writer = FileOutputStream(name)
+            val outWriter = OutputStreamWriter(writer)
+            outWriter.write(output)
+            outWriter.close()
+            writer.flush()
+            writer.close()
+        } catch (e: IOException) {
+            Log.e("RSA", e.message!!)
         }
     }
 
-    public static String readKey(String location) {
-        String value = ":";
-        try (BufferedReader br = new BufferedReader(new FileReader(location))) {
-            String sCurrentLine = br.readLine();
-            if (sCurrentLine != null) {
-                value = sCurrentLine;
+    @JvmStatic
+    fun readKey(location: String?): String {
+        var value: String? = ":"
+        try {
+            BufferedReader(FileReader(location)).use { br ->
+                val sCurrentLine = br.readLine()
+                if (sCurrentLine != null) {
+                    value = sCurrentLine
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return value;
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return value!!
         }
-        return value;
+        return value!!
     }
 
-    public static boolean decryptFile(String source, String destination, BigInteger d, BigInteger n) {
-        byte[] sourceBytes = getBytes(source);
+    @JvmStatic
+    fun decryptFile(source: String, destination: String?, d: BigInteger, n: BigInteger): Boolean {
+        val sourceBytes = getBytes(source)
         if (isNull(sourceBytes)) {
-            return false;
+            return false
         }
 
-        int k = (int) Math.ceil(n.bitLength() / 8.0);
-        BigInteger c, m;
-        byte[] EB, M;
-        byte[][] C = reshape(sourceBytes, k);
-        BufferedOutputStream out;
+        val k = ceil(n.bitLength() / 8.0).toInt()
+        var c: BigInteger?
+        var m: BigInteger?
+        var EB: ByteArray?
+        var M: ByteArray?
+        val C = RSA.reshape(sourceBytes!!, k)
+        val out: BufferedOutputStream?
 
         try {
             if (C != null) {
-                out = new BufferedOutputStream(new FileOutputStream(destination));
-                for (byte[] aC : C) {
-                    if (aC.length != k)
-                        return false;
-                    c = new BigInteger(aC);
-                    m = decrypt(c, d, n);
-                    EB = toByteArray(m, k);
+                out = BufferedOutputStream(FileOutputStream(destination))
+                for (aC in C) {
+                    if (aC.size != k) return false
+                    c = BigInteger(aC)
+                    m = decrypt(c, d, n)
+                    EB = toByteArray(m, k)
                     if (EB != null) {
-                        M = extractData(EB);
-                        out.write(M);
+                        M = extractData(EB)
+                        out.write(M)
                     }
                 }
-                out.close();
+                out.close()
             } else {
-                return false;
+                return false
             }
-            out.close();
-        } catch (IOException e) {
-            return false;
+            out.close()
+        } catch (e: IOException) {
+            return false
         }
-        return true;
+        return true
     }
 
     /**
      * Extracts the data portion of the byte array.
      */
-    private static byte[] extractData(byte[] EB) {
-        if (EB.length < 12 || EB[0] != 0x00 || EB[1] != 0x02) {
-            return null;
+    private fun extractData(EB: ByteArray): ByteArray? {
+        if (EB.size < 12 || EB[0].toInt() != 0x00 || EB[1].toInt() != 0x02) {
+            return null
         }
-        int index = 2;
+        var index = 2
         do {
+        } while (EB[index++].toInt() != 0x00)
 
-        } while (EB[index++] != 0x00);
-
-        return getSubArray(EB, index, EB.length);
+        return getSubArray(EB, index, EB.size)
     }
 
     /**
      * Performs the classical RSA computation.
      */
-    private static BigInteger decrypt(BigInteger c, BigInteger d, BigInteger n) {
-        return c.modPow(d, n);
+    private fun decrypt(c: BigInteger, d: BigInteger, n: BigInteger): BigInteger {
+        return c.modPow(d, n)
     }
 
-    public static byte[] getBytes(String fileName) {
-        File fIn = new File(fileName);
+    @JvmStatic
+    fun getBytes(fileName: String): ByteArray? {
+        val fIn = File(fileName)
         if (!fIn.canRead()) {
-            System.err.println("Can't read " + fileName);
-            return null;
+            System.err.println("Can't read " + fileName)
+            return null
         }
 
-        byte[] bytes = null;
-        try (FileInputStream in = new FileInputStream(fIn)) {
+        var bytes: ByteArray? = null
+        try {
+            FileInputStream(fIn).use { `in` ->
+                val fileSize = fIn.length()
+                if (fileSize > Int.Companion.MAX_VALUE) {
+                    println("Sorry, file was too large!")
+                }
 
-            long fileSize = fIn.length();
-            if (fileSize > Integer.MAX_VALUE) {
-                System.out.println("Sorry, file was too large!");
+                bytes = ByteArray(fileSize.toInt())
+
+                var offset = 0
+                var numRead = 0
+                while (offset < bytes.size && (`in`.read(bytes, offset, bytes.size - offset)
+                        .also { numRead = it }) >= 0
+                ) {
+                    offset += numRead
+                }
             }
-
-            bytes = new byte[(int) fileSize];
-
-            int offset = 0;
-            int numRead;
-            while (offset < bytes.length && (numRead = in.read(bytes, offset, bytes.length - offset)) >= 0) {
-                offset += numRead;
-            }
-        } catch (IOException ignored) {
+        } catch (ignored: IOException) {
         }
 
-        return bytes;
+        return bytes
     }
 
     /**
      * Performs the classical RSA computation.
      */
-    private static BigInteger encrypt(BigInteger m, BigInteger e, BigInteger n) {
-        return m.modPow(e, n);
+    private fun encrypt(m: BigInteger, e: BigInteger, n: BigInteger): BigInteger {
+        return m.modPow(e, n)
     }
 
     /**
      * Uses the key and returns true if encryption was successful.
      */
-    public static boolean encryptedFile(String source, String destination, BigInteger e, BigInteger n) {
-        byte[] sourceBytes = getBytes(source);
+    @JvmStatic
+    fun encryptedFile(source: String, destination: String?, e: BigInteger, n: BigInteger): Boolean {
+        val sourceBytes = getBytes(source)
         if (isNull(sourceBytes)) {
-            System.err.println(String.format("%s contained nothing.", source));
-            return false;
+            System.err.println(String.format("%s contained nothing.", source))
+            return false
         }
 
-        int k = (int) Math.ceil(n.bitLength() / 8.0);
-        byte BT = 0x02;
-        byte[] C, M;
-        byte[][] D = reshape(sourceBytes, k - 11);
-        ByteArrayOutputStream EB = new ByteArrayOutputStream(k);
-        FileOutputStream out;
-        BigInteger m, c;
+        val k = ceil(n.bitLength() / 8.0).toInt()
+        val BT: Byte = 0x02
+        var C: ByteArray?
+        var M: ByteArray?
+        val D = RSA.reshape(sourceBytes!!, k - 11)
+        val EB = ByteArrayOutputStream(k)
+        val out: FileOutputStream?
+        var m: BigInteger?
+        var c: BigInteger?
 
         try {
-
             if (D != null) {
-                out = new FileOutputStream(destination);
-                for (byte[] aD : D) {
-                    EB.reset();
-                    EB.write(0x00);
-                    EB.write(BT);
-                    EB.write(makePaddingString(k - aD.length - 3));
-                    EB.write(0x00);
-                    EB.write(aD);
-                    M = EB.toByteArray();
-                    m = new BigInteger(M);
-                    c = encrypt(m, e, n);
-                    C = toByteArray(c, k);
-                    out.write(C);
+                out = FileOutputStream(destination)
+                for (aD in D) {
+                    EB.reset()
+                    EB.write(0x00)
+                    EB.write(BT.toInt())
+                    EB.write(makePaddingString(k - aD.size - 3))
+                    EB.write(0x00)
+                    EB.write(aD)
+                    M = EB.toByteArray()
+                    m = BigInteger(M)
+                    c = encrypt(m, e, n)
+                    C = toByteArray(c, k)
+                    out.write(C)
                 }
 
-                out.close();
+                out.close()
             } else {
-                return false;
+                return false
             }
-        } catch (Exception ex) {
-            String errMsg = "An exception occured!%n%s%n%s%n%s";
-            System.err.println(String.format(errMsg, ex.getClass(), ex.getMessage(), Arrays.toString(ex.getStackTrace())));
-            return false;
+        } catch (ex: Exception) {
+            val errMsg = "An exception occured!%n%s%n%s%n%s"
+            System.err.println(
+                String.format(
+                    errMsg,
+                    ex.javaClass,
+                    ex.message,
+                    ex.getStackTrace().contentToString()
+                )
+            )
+            return false
         }
 
-        return true;
+        return true
     }
 
-    private static byte[][] reshape(byte[] inBytes, int colSize) {
+    private fun reshape(inBytes: ByteArray, colSize: Int): Array<ByteArray>? {
+        var colSize = colSize
         if (colSize < 1) {
-            colSize = 1;
+            colSize = 1
         }
 
-        int rowSize = (int) Math.ceil((double) inBytes.length / (double) colSize);
+        val rowSize = ceil(inBytes.size.toDouble() / colSize.toDouble()).toInt()
 
         if (rowSize == 0) {
-            return null;
+            return null
         }
 
-        byte[][] outBytes = new byte[rowSize][];
+        val outBytes: Array<ByteArray> = arrayOfNulls<ByteArray>(rowSize)
 
-        for (int i = 0; i < rowSize; i++) {
-            outBytes[i] = getSubArray(inBytes, i * colSize, (i + 1) * colSize);
+        for (i in 0..<rowSize) {
+            outBytes[i] = id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA.getSubArray(
+                inBytes,
+                i * colSize,
+                (i + 1) * colSize
+            )!!
         }
-        return outBytes;
+        return outBytes
     }
 
     /**
      * Returns a portion of the array argument.
      */
-    private static byte[] getSubArray(byte[] inBytes, int start, int end) {
-        if (start >= inBytes.length) {
-            return null;
+    private fun getSubArray(inBytes: ByteArray, start: Int, end: Int): ByteArray? {
+        var end = end
+        if (start >= inBytes.size) {
+            return null
         }
-        if (end > inBytes.length) {
-            end = inBytes.length;
+        if (end > inBytes.size) {
+            end = inBytes.size
         }
-        int bytesToGet = end - start;
+        val bytesToGet = end - start
         if (bytesToGet < 1) {
-            return null;
+            return null
         }
 
-        byte[] outBytes = new byte[bytesToGet];
-        if (end - start >= 0)
-            System.arraycopy(inBytes, start, outBytes, 0, end - start);
+        val outBytes = ByteArray(bytesToGet)
+        if (end - start >= 0) System.arraycopy(inBytes, start, outBytes, 0, end - start)
 
-        return outBytes;
+        return outBytes
     }
 
     /**
      * Converts a BigInteger into a byte array of the specified length.
      */
-    private static byte[] toByteArray(BigInteger x, int numBytes) {
+    private fun toByteArray(x: BigInteger, numBytes: Int): ByteArray? {
+        var x = x
+        var numBytes = numBytes
         if (x.compareTo(BigInteger.valueOf(256).pow(numBytes)) >= 0) {
-            return null; // number is to big to fit in the byte array
+            return null // number is to big to fit in the byte array
         }
 
-        byte[] ba = new byte[numBytes--];
-        BigInteger[] divAndRem;
+        val ba = ByteArray(numBytes--)
+        var divAndRem: Array<BigInteger?>?
 
-        for (int power = numBytes; power >= 0; power--) {
-            divAndRem = x.divideAndRemainder(BigInteger.valueOf(256).pow(power));
-            ba[numBytes - power] = (byte) divAndRem[0].intValue();
-            x = divAndRem[1];
+        for (power in numBytes downTo 0) {
+            divAndRem = x.divideAndRemainder(BigInteger.valueOf(256).pow(power))
+            ba[numBytes - power] = divAndRem[0]!!.toInt().toByte()
+            x = divAndRem[1]!!
         }
 
-        return ba;
+        return ba
     }
 
     /**
      * Generates an array of pseudo-random nonzero bytes.
      */
-    private static byte[] makePaddingString(int len) {
-        if (len < 8)
-            return null;
-        Random random = new Random();
+    private fun makePaddingString(len: Int): ByteArray? {
+        if (len < 8) return null
+        val random = Random()
 
-        byte[] PS = new byte[len];
-        for (int i = 0; i < len; i++) {
-            PS[i] = (byte) (random.nextInt(255) + 1);
+        val PS = ByteArray(len)
+        for (i in 0..<len) {
+            PS[i] = (random.nextInt(255) + 1).toByte()
         }
 
-        return PS;
+        return PS
     }
-
 }

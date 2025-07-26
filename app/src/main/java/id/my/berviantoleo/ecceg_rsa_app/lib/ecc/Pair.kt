@@ -1,31 +1,17 @@
-package id.my.berviantoleo.ecceg_rsa_app.lib.ecc;
+package id.my.berviantoleo.ecceg_rsa_app.lib.ecc
 
-import androidx.annotation.NonNull;
-
-public class Pair<L, R> {
-    public L left;
-    public R right;
-
-    public Pair(L left, R right) {
-        this.left = left;
-        this.right = right;
+class Pair<L, R>(var left: L?, var right: R?) {
+    override fun hashCode(): Int {
+        return left.hashCode() xor right.hashCode()
     }
 
-    @Override
-    public int hashCode() {
-        return left.hashCode() ^ right.hashCode();
+    override fun equals(other: Any?): Boolean {
+        if (other !is Pair<*, *>) return false
+        val pair = other
+        return left == pair.left && right == pair.right
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Pair)) return false;
-        Pair pair = (Pair) o;
-        return left.equals(pair.left) && right.equals(pair.right);
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return "<" + left.toString() + ", " + right.toString() + ">";
+    override fun toString(): String {
+        return "<$left, $right>"
     }
 }

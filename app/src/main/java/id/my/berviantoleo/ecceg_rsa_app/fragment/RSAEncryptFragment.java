@@ -1,9 +1,11 @@
 package id.my.berviantoleo.ecceg_rsa_app.fragment;
 
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +14,23 @@ import android.widget.Toast;
 import id.my.berviantoleo.ecceg_rsa_app.R;
 import id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA;
 import com.google.android.material.textfield.TextInputEditText;
-import com.obsez.android.lib.filechooser.ChooserDialog;
+import com.nareshchocha.filepickerlibrary.FilePickerResultContracts;
+import com.nareshchocha.filepickerlibrary.models.DocumentFilePickerConfig;
+import com.nareshchocha.filepickerlibrary.models.FilePickerResult;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.util.Objects;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import cc.cloudist.acplibrary.ACProgressFlower;
 
 import static android.os.Environment.getExternalStorageDirectory;
 
@@ -55,7 +61,7 @@ public class RSAEncryptFragment extends Fragment {
     @BindView(R.id.timeValue)
     protected TextInputEditText timeValue;
     private String keyPath;
-    private ACProgressFlower loadingView;
+    private AlertDialog dialog;
     private long startTime;
 
     public RSAEncryptFragment() {
@@ -72,40 +78,46 @@ public class RSAEncryptFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_rsaencrypt, container, false);
         ButterKnife.bind(this, view);
-        loadingView = new ACProgressFlower.Builder(getContext()).build();
-        loadingView.setCanceledOnTouchOutside(false);
-        loadingView.setCancelable(false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setCancelable(false); // if you want user to wait for some process to finish,
+        builder.setView(R.layout.layout_loading_dialog);
+        dialog = builder.create();
         return view;
     }
 
     @OnClick(R.id.open_public_button)
     void openPublicKey() {
-        new ChooserDialog(getActivity())
-                .withFilter(false, false, "pub")
-                .withStartFile(getExternalStorageDirectory().getAbsolutePath())
-                .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener((path, pathFile) -> {
-                    keyPath = pathFile.getPath();
-                    loadingView.show();
-                    new OpenKey(RSAEncryptFragment.this).execute(keyPath);
-                })
-                .build()
-                .show();
+        ActivityResultLauncher<DocumentFilePickerConfig> launcher = registerForActivityResult(new FilePickerResultContracts.PickDocumentFile(), (ActivityResultCallback<FilePickerResult>) result -> {
+            String errorMessage = result.getErrorMessage();
+            if (errorMessage != null) {
+                Log.e("Picker", errorMessage);
+            } else {
+                keyPath = result.getSelectedFilePath();
+                dialog.show();
+                new OpenKey(RSAEncryptFragment.this).execute(keyPath);
+            }
+        });
+        DocumentFilePickerConfig config = new DocumentFilePickerConfig();
+        launcher.launch(config);
     }
 
     @OnClick(R.id.select_encrypt_file_button)
     void openFileEncrypt() {
-        new ChooserDialog(getActivity())
-                .withStartFile(getExternalStorageDirectory().getAbsolutePath())
-                .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener((path, pathFile) -> {
-                    encryptLoc.setText(pathFile.getPath());
-                    inputSize.setText(String.valueOf(pathFile.length()));
-                    loadingView.show();
-                    new SetInput(RSAEncryptFragment.this).execute(pathFile.getPath());
-                })
-                .build()
-                .show();
+        ActivityResultLauncher<DocumentFilePickerConfig> launcher = registerForActivityResult(new FilePickerResultContracts.PickDocumentFile(), (ActivityResultCallback<FilePickerResult>) result -> {
+            String errorMessage = result.getErrorMessage();
+            if (errorMessage != null) {
+                Log.e("Picker", errorMessage);
+            } else {
+                String path = result.getSelectedFilePath();
+                if (path == null) return;
+                encryptLoc.setText(path);
+                inputSize.setText(String.valueOf(path.length()));
+                dialog.show();
+                new SetInput(RSAEncryptFragment.this).execute(path);
+            }
+        });
+        DocumentFilePickerConfig config = new DocumentFilePickerConfig();
+        launcher.launch(config);
     }
 
     @OnClick(R.id.encrypt_button)
@@ -114,7 +126,7 @@ public class RSAEncryptFragment extends Fragment {
                 !Objects.requireNonNull(encryptLocValue.getText()).toString().equalsIgnoreCase("") &&
                 !Objects.requireNonNull(nModulus.getText()).toString().equalsIgnoreCase("")
                 && !Objects.requireNonNull(publicKey.getText()).toString().equalsIgnoreCase("")) {
-            loadingView.show();
+            dialog.show();
             File file = Environment.getExternalStorageDirectory();
             File location = new File(file, "RSA/");
             if (!location.exists()) {
@@ -148,7 +160,7 @@ public class RSAEncryptFragment extends Fragment {
             outputValue.setText(hex);
             File file = new File(Environment.getExternalStorageDirectory().getPath() + "/RSA/" + Objects.requireNonNull(encryptLocValue.getText()).toString());
             outputSize.setText(String.valueOf(file.length()));
-            loadingView.dismiss();
+            dialog.dismiss();
             Toast.makeText(getActivity(), "Finished Encrypt", Toast.LENGTH_SHORT).show();
         }
     }
@@ -172,7 +184,7 @@ public class RSAEncryptFragment extends Fragment {
             String pubKey = key[1];
             publicKey.setText(pubKey);
             nModulus.setText(N);
-            loadingView.dismiss();
+            dialog.dismiss();
         }
     }
 
@@ -197,7 +209,7 @@ public class RSAEncryptFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             inputValue.setText(s);
-            loadingView.dismiss();
+            dialog.dismiss();
         }
     }
 }

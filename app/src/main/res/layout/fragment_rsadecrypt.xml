@@ -63,7 +63,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/open_private_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,14 +73,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layout_n_key_decrypt"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#0FF00F"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Search Private Key"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#0FF00F"
+            android:text="Search Private Key"
+            android:textColor="#FFFFFF" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/file_decrypt_open"
@@ -102,7 +97,7 @@
                 android:hint="File to Decrypt" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/select_decrypt_file_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -112,14 +107,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/file_decrypt_open"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#000CFF"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Select File"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#000CFF"
+            android:text="Select File"
+            android:textColor="#FFFFFF" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/file_decrypt_loc"
@@ -140,7 +130,7 @@
                 android:hint="Decrypt File Name" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/decrypt_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -150,14 +140,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/file_decrypt_loc"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#000CFF"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Decrypt"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#000CFF"
+            android:text="Decrypt"
+            android:textColor="#FFFFFF" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/outputLayoutDecrypt"

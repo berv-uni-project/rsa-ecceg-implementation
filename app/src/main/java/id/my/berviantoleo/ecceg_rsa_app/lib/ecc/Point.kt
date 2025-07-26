@@ -1,21 +1,13 @@
-package id.my.berviantoleo.ecceg_rsa_app.lib.ecc;
+package id.my.berviantoleo.ecceg_rsa_app.lib.ecc
 
-import java.math.BigInteger;
+import java.math.BigInteger
 
-import androidx.annotation.NonNull;
+class Point {
+    var x: BigInteger? = BigInteger.ZERO
+    var y: BigInteger? = BigInteger.ZERO // x = absis, y = ordinat
+    var infinity: Boolean = false // titik O, elemen identitas
 
-public class Point {
-    public BigInteger x, y; // x = absis, y = ordinat
-    boolean infinity; // titik O, elemen identitas
-
-    public Point() {
-        x = BigInteger.ZERO;
-        y = BigInteger.ZERO;
-        infinity = false;
-    }
-
-    @NonNull
-    public String toString() {
-        return "(" + x + ", " + y + ")";
+    override fun toString(): String {
+        return "($x, $y)"
     }
 }

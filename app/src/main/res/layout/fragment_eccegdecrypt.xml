@@ -60,19 +60,15 @@
                 android:hint="Private Key Location" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/search_private_key_ecceg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#000CFF"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Search Private Key"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#000CFF"
+            android:radius="10dp"
+            android:text="Search Private Key"
+            android:textColor="#FFFFFF" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -86,19 +82,15 @@
                 android:hint="Lokasi Cipher Teks" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/search_cipher_text_ecceg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#000CFF"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Search Cipher Text"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#000CFF"
+            android:radius="10dp"
+            android:text="Search Cipher Text"
+            android:textColor="#FFFFFF" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -111,19 +103,15 @@
                 android:hint="Decrypt Text Name" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/decrypt_button_ecceg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#000CFF"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Decrypt"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#000CFF"
+            android:radius="10dp"
+            android:text="Decrypt"
+            android:textColor="#FFFFFF" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"

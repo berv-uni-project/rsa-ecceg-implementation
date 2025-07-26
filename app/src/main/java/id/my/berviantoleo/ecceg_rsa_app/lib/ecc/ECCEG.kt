@@ -1,119 +1,122 @@
-package id.my.berviantoleo.ecceg_rsa_app.lib.ecc;
+package id.my.berviantoleo.ecceg_rsa_app.lib.ecc
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.io.File
+import java.io.FileOutputStream
+import java.math.BigInteger
+import java.security.SecureRandom
+import java.util.Random
+import java.util.Scanner
 
-public class ECCEG {
-    private Point publicKey;
-    private BigInteger privateKey;
-    private Point basePoint;
-    private ECC ECC;
+class ECCEG {
+    @JvmField
+    var publicKey: Point
+    private var privateKey: BigInteger?
+    val basePoint: Point
+    val eCC: ECC
 
-    public ECCEG(ECC ECC, Point basePoint) {
-        this.ECC = ECC;
-        this.basePoint = basePoint;
-        this.privateKey = new BigInteger(ECC.p.bitLength(), new Random())
+    constructor(ECC: ECC, basePoint: Point) {
+        this.eCC = ECC
+        this.basePoint = basePoint
+        this.privateKey = BigInteger(ECC.p.bitLength(), Random())
             .mod(ECC.p.subtract(BigInteger.ONE))
-            .add(BigInteger.ONE);
-        this.publicKey = ECC.multiply(privateKey, basePoint);
+            .add(BigInteger.ONE)
+        this.publicKey = ECC.multiply(privateKey!!, basePoint)
     }
 
-    public ECCEG(ECC ECC, Point basePoint, BigInteger privateKey) {
-        this.ECC = ECC;
-        this.basePoint = basePoint;
-        this.privateKey = privateKey;
-        this.publicKey = ECC.multiply(privateKey, basePoint);
+    constructor(ECC: ECC, basePoint: Point, privateKey: BigInteger) {
+        this.eCC = ECC
+        this.basePoint = basePoint
+        this.privateKey = privateKey
+        this.publicKey = ECC.multiply(privateKey, basePoint)
     }
 
-    public Point getPublicKey() { return this.publicKey; }
-    public BigInteger getPrivateKey() { return this.privateKey; }
-    public ECC getECC() { return this.ECC; }
-    public Point getBasePoint() { return this.basePoint; }
+    fun getPrivateKey(): BigInteger {
+        return this.privateKey!!
+    }
 
-    public void setPublicKey(Point publicKey) { this.publicKey = publicKey; }
-    public void setPrivateKey(BigInteger privateKey) { this.privateKey = privateKey; }
+    fun setPrivateKey(privateKey: BigInteger) {
+        this.privateKey = privateKey
+    }
 
-    public void savePublicKey(String fileName) throws Exception {
+    @Throws(Exception::class)
+    fun savePublicKey(fileName: String) {
         // disimpan x dan y, dipisahkan dengan spasi
-        File file = new File(fileName);
-        if (!file.exists()) file.createNewFile();
-        FileOutputStream out = new FileOutputStream(file);
-        out.write(publicKey.x.toString().getBytes());
-        out.write(' ');
-        out.write(publicKey.y.toString().getBytes());
-        out.flush();
-        out.close();
+        val file = File(fileName)
+        if (!file.exists()) file.createNewFile()
+        val out = FileOutputStream(file)
+        out.write(publicKey.x.toString().toByteArray())
+        out.write(' '.code)
+        out.write(publicKey.y.toString().toByteArray())
+        out.flush()
+        out.close()
     }
 
-    public void savePrivateKey(String fileName) throws Exception {
-        File file = new File(fileName);
-        if (!file.exists()) file.createNewFile();
-        FileOutputStream out = new FileOutputStream(file);
-        out.write(privateKey.toString().getBytes());
-        out.flush();
-        out.close();
+    @Throws(Exception::class)
+    fun savePrivateKey(fileName: String) {
+        val file = File(fileName)
+        if (!file.exists()) file.createNewFile()
+        val out = FileOutputStream(file)
+        out.write(privateKey.toString().toByteArray())
+        out.flush()
+        out.close()
     }
 
-    public void loadPublicKey(String fileName) throws Exception {
-        File file = new File(fileName);
-        Scanner sc = new Scanner(file);
-        BigInteger x = null, y = null;
-        if (sc.hasNextBigInteger()) x = sc.nextBigInteger();
-        if (sc.hasNextBigInteger()) y = sc.nextBigInteger();
-        sc.close();
+    @Throws(Exception::class)
+    fun loadPublicKey(fileName: String) {
+        val file = File(fileName)
+        val sc = Scanner(file)
+        var x: BigInteger? = null
+        var y: BigInteger? = null
+        if (sc.hasNextBigInteger()) x = sc.nextBigInteger()
+        if (sc.hasNextBigInteger()) y = sc.nextBigInteger()
+        sc.close()
         if (x != null && y != null) {
-            Point point = new Point();
-            point.x = x;
-            point.y = y;
-            this.publicKey = point;
+            val point = Point()
+            point.x = x
+            point.y = y
+            this.publicKey = point
         }
     }
 
-    public void loadPrivateKey(String fileName) throws Exception {
-        File file = new File(fileName);
-        Scanner sc = new Scanner(file);
-        BigInteger i = null;
-        if (sc.hasNextBigInteger()) i = sc.nextBigInteger();
-        sc.close();
+    @Throws(Exception::class)
+    fun loadPrivateKey(fileName: String) {
+        val file = File(fileName)
+        val sc = Scanner(file)
+        var i: BigInteger? = null
+        if (sc.hasNextBigInteger()) i = sc.nextBigInteger()
+        sc.close()
         if (i != null) {
-            this.privateKey = i;
+            this.privateKey = i
         }
     }
 
-    public Pair<Point, Point> encrypt(Point p) {
-        BigInteger k = new BigInteger(ECC.p.bitLength(), new SecureRandom())
-            .mod(ECC.p.subtract(BigInteger.ONE))
-            .add(BigInteger.ONE);
-        Point left = ECC.multiply(k, basePoint);
-        Point right = ECC.add(p, ECC.multiply(k, publicKey));
-        return new Pair<Point, Point>(left, right);
+    fun encrypt(p: Point): Pair<Point?, Point?> {
+        val k = BigInteger(eCC.p.bitLength(), SecureRandom())
+            .mod(eCC.p.subtract(BigInteger.ONE))
+            .add(BigInteger.ONE)
+        val left: Point = eCC.multiply(k, basePoint)
+        val right: Point = eCC.add(p, eCC.multiply(k, publicKey))
+        return Pair<Point?, Point?>(left, right)
     }
 
-    public List<Pair<Point, Point>> encryptBytes(byte[] bytes) {
-        List<Pair<Point, Point>> ret = new ArrayList<>();
-        for (byte aByte : bytes) ret.add(encrypt(ECC.intToPoint(BigInteger.valueOf(aByte))));
-        return ret;
+    fun encryptBytes(bytes: ByteArray): MutableList<Pair<Point?, Point?>?> {
+        val ret: MutableList<Pair<Point?, Point?>?> = ArrayList<Pair<Point?, Point?>?>()
+        for (aByte in bytes) ret.add(encrypt(eCC.intToPoint(BigInteger.valueOf(aByte.toLong()))))
+        return ret
     }
 
-    public Point decrypt(Pair<Point, Point> p) {
-        Point m = ECC.multiply(privateKey, p.left);
+    fun decrypt(p: Pair<Point?, Point?>): Point {
+        val m: Point = eCC.multiply(privateKey!!, p.left!!)
 
-        Point minusM = new Point();
-        minusM.x = m.x;
-        minusM.y = m.y.negate().mod(ECC.p);
-        return ECC.add(p.right, minusM);
+        val minusM = Point()
+        minusM.x = m.x
+        minusM.y = m.y?.negate()?.mod(eCC.p)
+        return eCC.add(p.right!!, minusM)
     }
 
-    public List<Point> decrypt(List<Pair<Point, Point>> l) {
-        List<Point> ret = new ArrayList<>();
-        for (Pair<Point, Point> p: l)
-            ret.add(decrypt(p));
-        return ret;
+    fun decrypt(l: MutableList<Pair<Point?, Point?>>): MutableList<Point?> {
+        val ret: MutableList<Point?> = ArrayList<Point?>()
+        for (p in l) ret.add(decrypt(p))
+        return ret
     }
 }

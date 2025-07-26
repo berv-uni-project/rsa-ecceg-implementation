@@ -1,150 +1,156 @@
-package id.my.berviantoleo.ecceg_rsa_app.utils;
+package id.my.berviantoleo.ecceg_rsa_app.utils
 
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Pair;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Point;
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Pair
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Point
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.math.BigInteger
+import java.nio.ByteBuffer
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-
-public class FileUtils {
-    public static byte[] getBytes(String fileName) {
-        File fIn = new File(fileName);
+object FileUtils {
+    @JvmStatic
+    fun getBytes(fileName: String): ByteArray? {
+        val fIn = File(fileName)
         if (!fIn.canRead()) {
-            System.err.println("Can't read " + fileName);
-            return null;
+            System.err.println("Can't read " + fileName)
+            return null
         }
 
-        byte[] bytes = null;
-        try (FileInputStream in = new FileInputStream(fIn)) {
-
-            long fileSize = fIn.length();
-            if (fileSize > Integer.MAX_VALUE) {
-                System.out.println("Sorry, file was too large!");
-            }
-
-            bytes = new byte[(int) fileSize];
-
-            int offset = 0;
-            int numRead;
-            while (offset < bytes.length && (numRead = in.read(bytes, offset, bytes.length - offset)) >= 0) {
-                offset += numRead;
-            }
-        } catch (IOException ignored) {
-        }
-
-        return bytes;
-    }
-
-
-    public static void saveFile(String stringpath, byte[] content) {
+        var bytes: ByteArray? = null
         try {
-            FileOutputStream fos = new FileOutputStream(stringpath);
-            fos.write(content);
-            fos.close();
-        } catch (IOException ignored) {
+            FileInputStream(fIn).use { `in` ->
+                val fileSize = fIn.length()
+                if (fileSize > Int.Companion.MAX_VALUE) {
+                    println("Sorry, file was too large!")
+                }
+
+                bytes = ByteArray(fileSize.toInt())
+
+                var offset = 0
+                var numRead = 0
+                while (offset < bytes.size && (`in`.read(bytes, offset, bytes.size - offset)
+                        .also { numRead = it }) >= 0
+                ) {
+                    offset += numRead
+                }
+            }
+        } catch (ignored: IOException) {
+        }
+
+        return bytes
+    }
+
+
+    @JvmStatic
+    fun saveFile(stringpath: String?, content: ByteArray?) {
+        try {
+            val fos = FileOutputStream(stringpath)
+            fos.write(content)
+            fos.close()
+        } catch (ignored: IOException) {
         }
     }
 
-    private static byte[] intToBytes(int x) {
-        return ByteBuffer.allocate(4).putInt(x).array();
+    private fun intToBytes(x: Int): ByteArray {
+        return ByteBuffer.allocate(4).putInt(x).array()
     }
 
-    private static int bytesToInt(byte[] bytes) {
-        return ByteBuffer.wrap(bytes).getInt();
+    private fun bytesToInt(bytes: ByteArray): Int {
+        return ByteBuffer.wrap(bytes).getInt()
     }
 
-    public static void savePointsToFile(String path, List<Pair<Point, Point>> pairpoints) {
-        byte[] b = new byte[pairpoints.size() * 16];
-        int j = 0;
-        for (Pair<Point, Point> ppoint : pairpoints) {
-            byte[] btemp = intToBytes(ppoint.left.x.intValue());
-            for (byte aBtemp : btemp) {
-                b[j] = aBtemp;
-                j++;
+    fun savePointsToFile(path: String?, pairpoints: MutableList<Pair<Point?, Point?>>) {
+        val b = ByteArray(pairpoints.size * 16)
+        var j = 0
+        for (ppoint in pairpoints) {
+            var btemp = intToBytes(ppoint.left!!.x.toInt())
+            for (aBtemp in btemp) {
+                b[j] = aBtemp
+                j++
             }
-            btemp = intToBytes(ppoint.left.y.intValue());
-            for (byte aBtemp : btemp) {
-                b[j] = aBtemp;
-                j++;
+            btemp = intToBytes(ppoint.left!!.y.toInt())
+            for (aBtemp in btemp) {
+                b[j] = aBtemp
+                j++
             }
-            btemp = intToBytes(ppoint.right.x.intValue());
-            for (byte aBtemp : btemp) {
-                b[j] = aBtemp;
-                j++;
+            btemp = intToBytes(ppoint.right!!.x.toInt())
+            for (aBtemp in btemp) {
+                b[j] = aBtemp
+                j++
             }
-            btemp = intToBytes(ppoint.right.y.intValue());
-            for (byte aBtemp : btemp) {
-                b[j] = aBtemp;
-                j++;
+            btemp = intToBytes(ppoint.right!!.y.toInt())
+            for (aBtemp in btemp) {
+                b[j] = aBtemp
+                j++
             }
         }
-        saveFile(path, b);
+        saveFile(path, b)
     }
 
-    private static final String HEXES = "0123456789ABCDEF";
+    private const val HEXES = "0123456789ABCDEF"
 
-    private static boolean isNull(Object obj) {
-        return obj == null;
+    private fun isNull(obj: Any?): Boolean {
+        return obj == null
     }
 
-    public static String showHexFromFile(String file) {
-        byte[] sourceBytes = getBytes(file);
+    @JvmStatic
+    fun showHexFromFile(file: String): String {
+        val sourceBytes = getBytes(file)
         if (isNull(sourceBytes)) {
-            return "";
+            return ""
         }
-        return getHex(sourceBytes);
+        return FileUtils.getHex(sourceBytes!!)
     }
 
-    private static String getHex(byte[] raw) {
-        final StringBuilder hex = new StringBuilder(2 * raw.length);
-        for (final byte b : raw) {
-            hex.append(HEXES.charAt((b & 0xF0) >> 4)).append(HEXES.charAt((b & 0x0F)));
+    private fun getHex(raw: ByteArray): String {
+        val hex = StringBuilder(2 * raw.size)
+        for (b in raw) {
+            hex.append(HEXES.get((b.toInt() and 0xF0) shr 4))
+                .append(HEXES.get((b.toInt() and 0x0F)))
         }
-        return hex.toString();
+        return hex.toString()
     }
 
 
-    public static List<Pair<Point, Point>> loadPointsFromFile(String stringpath) {
-        byte[] rawData = getBytes(stringpath);
-        List<Pair<Point, Point>> pair = new ArrayList<>();
-        byte[] btemp = new byte[4];
-        int f = 0, s;
-        Point point1 = new Point();
-        point1.x = BigInteger.valueOf(1);
-        point1.y = BigInteger.valueOf(1);
-        Point point2 = new Point();
-        point2.x = BigInteger.valueOf(1);
-        point2.y = BigInteger.valueOf(1);
-        for (int i = 0; i < (rawData != null ? rawData.length : 0); i++) {
-            btemp[i % 4] = rawData[i];
+    @JvmStatic
+    fun loadPointsFromFile(stringpath: String): MutableList<Pair<Point?, Point?>?> {
+        val rawData = getBytes(stringpath)
+        val pair: MutableList<Pair<Point?, Point?>?> = ArrayList<Pair<Point?, Point?>?>()
+        val btemp = ByteArray(4)
+        var f = 0
+        var s: Int
+        var point1 = Point()
+        point1.x = BigInteger.valueOf(1)
+        point1.y = BigInteger.valueOf(1)
+        var point2 = Point()
+        point2.x = BigInteger.valueOf(1)
+        point2.y = BigInteger.valueOf(1)
+        for (i in 0..<(if (rawData != null) rawData.size else 0)) {
+            btemp[i % 4] = rawData!![i]
             if (i % 4 == 3) {
                 if ((i / 4) % 4 == 0) {
-                    f = bytesToInt(btemp);
+                    f = bytesToInt(btemp)
                 }
                 if ((i / 4) % 4 == 1) {
-                    s = bytesToInt(btemp);
-                    point1 = new Point();
-                    point1.x = BigInteger.valueOf(f);
-                    point1.y = BigInteger.valueOf(s);
+                    s = bytesToInt(btemp)
+                    point1 = Point()
+                    point1.x = BigInteger.valueOf(f.toLong())
+                    point1.y = BigInteger.valueOf(s.toLong())
                 }
                 if ((i / 4) % 4 == 2) {
-                    f = bytesToInt(btemp);
+                    f = bytesToInt(btemp)
                 }
                 if ((i / 4) % 4 == 3) {
-                    s = bytesToInt(btemp);
-                    point2 = new Point();
-                    point2.x = BigInteger.valueOf(f);
-                    point2.y = BigInteger.valueOf(s);
-                    pair.add(new Pair<>(point1, point2));
+                    s = bytesToInt(btemp)
+                    point2 = Point()
+                    point2.x = BigInteger.valueOf(f.toLong())
+                    point2.y = BigInteger.valueOf(s.toLong())
+                    pair.add(Pair<Point?, Point?>(point1, point2))
                 }
             }
         }
-        return pair;
+        return pair
     }
 }
