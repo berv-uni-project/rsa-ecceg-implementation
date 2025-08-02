@@ -1,204 +1,258 @@
-package id.my.berviantoleo.ecceg_rsa_app.fragment;
+package id.my.berviantoleo.ecceg_rsa_app.fragment
 
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
+import android.os.Bundle
+import android.os.Environment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import cc.cloudist.acplibrary.ACProgressFlower
+import com.developer.filepicker.model.DialogConfigs
+import com.developer.filepicker.model.DialogProperties
+import com.developer.filepicker.view.FilePickerDialog
+import id.my.berviantoleo.ecceg_rsa_app.R
+import id.my.berviantoleo.ecceg_rsa_app.databinding.FragmentEccegdecryptBinding
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.ECC
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.ECCEG
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Point
+import id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.math.BigInteger
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+class ECCEGDecryptFragment : Fragment() {
 
-import com.google.android.material.textfield.TextInputEditText;
-import com.obsez.android.lib.filechooser.ChooserDialog;
+    private var _binding: FragmentEccegdecryptBinding? = null
+    private val binding get() = _binding!!
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Objects;
+    private var loadingView: ACProgressFlower? = null
+    private var privateKeyPath: String? = null
+    private var cipherTextPath: String? = null
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import cc.cloudist.acplibrary.ACProgressFlower;
-import id.my.berviantoleo.ecceg_rsa_app.R;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.ECC;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.ECCEG;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Pair;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Point;
-import id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils;
-
-import static android.os.Environment.getExternalStorageDirectory;
-
-
-public class ECCEGDecryptFragment extends Fragment {
-
-    @BindView(R.id.private_key_loc_ecceg_value)
-    protected TextInputEditText privateKeyLoc;
-    @BindView(R.id.cipher_decrypt_text_loc_value_ecceg)
-    protected TextInputEditText cipherTextLoc;
-    @BindView(R.id.decrypt_text_loc_ecceg)
-    protected TextInputEditText decryptTextLoc;
-    @BindView(R.id.input_file_decrypt_ecceg)
-    protected TextInputEditText inputContent;
-    @BindView(R.id.output_file_decrypt_ecceg)
-    protected TextInputEditText outputContent;
-    @BindView(R.id.input_file_size_decrypt_ecceg)
-    protected TextInputEditText inputSize;
-    @BindView(R.id.output_file_size_decrypt_ecceg)
-    protected TextInputEditText outputSize;
-    @BindView(R.id.time_decrypt_ecceg)
-    protected TextInputEditText timeElapsed;
-    @BindView(R.id.a_decrypt_ecceg_value)
-    protected TextInputEditText a;
-    @BindView(R.id.b_decrypt_ecceg_value)
-    protected TextInputEditText b;
-    @BindView(R.id.p_decrypt_ecceg_value)
-    protected TextInputEditText p;
-    private ACProgressFlower loadingView;
-    private long startTime;
-    private long endTime;
-
-
-    public ECCEGDecryptFragment() {
-        // Required empty public constructor
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentEccegdecryptBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    public static ECCEGDecryptFragment newInstance() {
-        return new ECCEGDecryptFragment();
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_eccegdecrypt, container, false);
-        ButterKnife.bind(this, view);
-        loadingView = new ACProgressFlower.Builder(getContext()).build();
-        loadingView.setCanceledOnTouchOutside(false);
-        loadingView.setCancelable(false);
-        return view;
-    }
+        loadingView = ACProgressFlower.Builder(context)
+            .direction(ACProgressFlower.Direction.CLOCKWISE)
+            .themeColor(resources.getColor(R.color.colorPrimary, requireActivity().theme))
+            .fadeColor(resources.getColor(R.color.colorAccent, requireActivity().theme))
+            .build()
+        loadingView?.setCancelable(false)
+        loadingView?.setCanceledOnTouchOutside(false)
 
-    @OnClick(R.id.decrypt_button_ecceg)
-    void decrypt() {
-        if (!Objects.requireNonNull(privateKeyLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(decryptTextLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(cipherTextLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(a.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(b.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(p.getText()).toString().equalsIgnoreCase("")) {
-            File file = Environment.getExternalStorageDirectory();
-            File location = new File(file, "ECCEG/");
-            if (!location.exists()) {
-                location.mkdir();
-            }
-            String decryptLoc = location.getAbsolutePath() + "/" + decryptTextLoc.getText().toString();
-            new ECCEGDecryptFragment.Decrypt(ECCEGDecryptFragment.this).execute(
-                    a.getText().toString(),
-                    b.getText().toString(),
-                    p.getText().toString(),
-                    privateKeyLoc.getText().toString(),
-                    cipherTextLoc.getText().toString(),
-                    decryptLoc
-            );
+        binding.searchPrivateKeyEccegDecrypt.setOnClickListener {
+            selectPrivateKeyFile()
+        }
+
+        binding.searchCipherTextEccegDecrypt.setOnClickListener {
+            selectCipherTextFile()
+        }
+
+        binding.decryptButtonEcceg.setOnClickListener {
+            decryptData()
         }
     }
 
-    @OnClick(R.id.search_private_key_ecceg)
-    void openPrivateKey() {
-        new ChooserDialog(getActivity())
-                .withFilter(false, false, "pri")
-                .withStartFile(getExternalStorageDirectory().getAbsolutePath())
-                .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener((path, pathFile) -> privateKeyLoc.setText(pathFile.getPath()))
-                .build()
-                .show();
-    }
-
-    @OnClick(R.id.search_cipher_text_ecceg)
-    void searchCipherText() {
-        new ChooserDialog(getActivity())
-                .withStartFile(getExternalStorageDirectory().getAbsolutePath())
-                .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener((path, pathFile) -> {
-                    cipherTextLoc.setText(pathFile.getPath());
-                    inputSize.setText(String.valueOf(pathFile.length()));
-                    loadingView.show();
-                    new SetInput(ECCEGDecryptFragment.this).execute(pathFile.getPath());
-                })
-                .build()
-                .show();
-    }
-
-    private class Decrypt extends AsyncTask<String, Integer, String> {
-
-        // only retain a weak reference to the activity
-        Decrypt(ECCEGDecryptFragment context) {
-            new WeakReference<>(context);
+    private fun selectPrivateKeyFile() {
+        val properties = DialogProperties().apply {
+            selection_mode = DialogConfigs.SINGLE_MODE
+            selection_type = DialogConfigs.FILE_SELECT
+            root = Environment.getExternalStorageDirectory()
+            error_dir = File(DialogConfigs.DEFAULT_DIR)
+            offset = File(DialogConfigs.DEFAULT_DIR)
+            extensions = null // Allow all file types or specify if needed
+            show_hidden_files = false
         }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            startTime = System.currentTimeMillis();
-            try {
-                ECC ecc = new ECC();
-                ecc.a = new BigInteger(strings[0]);
-                ecc.b = new BigInteger(strings[1]);
-                ecc.p = new BigInteger(strings[2]);
-                ecc.k = BigInteger.valueOf(30);
-                ECCEG ecceg = new ECCEG(ecc, ecc.getBasePoint());
-                ecceg.loadPrivateKey(strings[3]);
-                List<Pair<Point, Point>> read_enc = FileUtils.loadPointsFromFile(strings[4]);
-                List<Point> read_dec = ecceg.decrypt(read_enc);
-                StringBuilder stringBuilder = new StringBuilder();
-                for (Point pp : read_dec)
-                    stringBuilder.append((char) ecc.pointToInt(pp).byteValue());
-                endTime = System.currentTimeMillis();
-                FileUtils.saveFile(strings[5], stringBuilder.toString().getBytes());
-                return stringBuilder.toString();
-            } catch (Exception e) {
-                Log.e("Decrypt", e.getMessage());
-                return "failed";
+        val dialog = FilePickerDialog(context, properties)
+        dialog.setTitle("Select Private Key File")
+        dialog.setDialogSelectionListener { files ->
+            if (files.isNotEmpty()) {
+                privateKeyPath = files[0]
+                binding.privateKeyLocEccegValue.setText(privateKeyPath)
             }
         }
-
-        @Override
-        protected void onPostExecute(String hex) {
-            timeElapsed.setText(String.valueOf(endTime - startTime));
-            outputContent.setText(hex);
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/ECCEG/" + decryptTextLoc.getText().toString());
-            outputSize.setText(String.valueOf(file.length()));
-            loadingView.dismiss();
-            Toast.makeText(getActivity(), "Finished Encrypt", Toast.LENGTH_SHORT).show();
-        }
+        dialog.show()
     }
 
-    private class SetInput extends AsyncTask<String, Integer, String> {
-
-        // only retain a weak reference to the activity
-        SetInput(ECCEGDecryptFragment context) {
-            new WeakReference<>(context);
+    private fun selectCipherTextFile() {
+        val properties = DialogProperties().apply {
+            selection_mode = DialogConfigs.SINGLE_MODE
+            selection_type = DialogConfigs.FILE_SELECT
+            root = Environment.getExternalStorageDirectory()
+            error_dir = File(DialogConfigs.DEFAULT_DIR)
+            offset = File(DialogConfigs.DEFAULT_DIR)
+            extensions = null // Allow all file types or specify if needed
+            show_hidden_files = false
         }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            if (strings.length == 1) {
-                return FileUtils.showHexFromFile(strings[0]);
+        val dialog = FilePickerDialog(context, properties)
+        dialog.setTitle("Select Cipher Text File")
+        dialog.setDialogSelectionListener { files ->
+            if (files.isNotEmpty()) {
+                cipherTextPath = files[0]
+                binding.cipherTextLocEccegValue.setText(cipherTextPath)
+                lifecycleScope.launch {
+                    loadCipherTextFileContent(cipherTextPath!!)
+                }
             }
-            return "";
         }
+        dialog.show()
+    }
 
-        @Override
-        protected void onPostExecute(String s) {
-            inputContent.setText(s);
-            loadingView.dismiss();
+    private suspend fun loadCipherTextFileContent(filePath: String) {
+        withContext(Dispatchers.Main) {
+            loadingView?.show()
+        }
+        try {
+            val fileContentHex = withContext(Dispatchers.IO) {
+                FileUtils.showHexFromFile(filePath)
+            }
+            val fileSize = withContext(Dispatchers.IO) {
+                File(filePath).length().toString()
+            }
+            withContext(Dispatchers.Main) {
+                binding.inputFileDecryptEcceg.setText(fileContentHex)
+                binding.inputFileSizeDecryptEcceg.setText(fileSize)
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Error reading cipher text file: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        } finally {
+            withContext(Dispatchers.Main) {
+                loadingView?.dismiss()
+            }
         }
     }
 
+    private fun decryptData() {
+        val privateKeyLocation = binding.privateKeyLocEccegValue.text.toString()
+        val cipherTextLocation = binding.cipherTextLocEccegValue.text.toString()
+        val plainTextSaveLocation = binding.plainTextLocEccegValue.text.toString()
+        val aStr = binding.aDecryptEccegValue.text.toString()
+        val bStr = binding.bDecryptEccegValue.text.toString()
+        val pStr = binding.pDecryptEccegValue.text.toString()
 
+        if (privateKeyLocation.isBlank() || cipherTextLocation.isBlank() || plainTextSaveLocation.isBlank() ||
+            aStr.isBlank() || bStr.isBlank() || pStr.isBlank()
+        ) {
+            Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val a = BigInteger(aStr)
+            val b = BigInteger(bStr)
+            val p = BigInteger(pStr)
+
+            lifecycleScope.launch {
+                performDecryption(privateKeyLocation, cipherTextLocation, plainTextSaveLocation, a, b, p)
+            }
+
+        } catch (e: NumberFormatException) {
+            Toast.makeText(context, "Invalid ECC parameters (a, b, or p). Please enter valid numbers.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private suspend fun performDecryption(
+        privateKeyPath: String,
+        cipherTextPath: String,
+        plainTextSavePath: String,
+        a: BigInteger,
+        b: BigInteger,
+        p: BigInteger
+    ) {
+        withContext(Dispatchers.Main) {
+            loadingView?.show()
+        }
+        var resultMessage = "Decryption Failed"
+        var plainTextHex: String? = null
+        var outputFileSize: String? = null
+        var executionTime: String? = null
+
+        try {
+            val ecc = ECC().apply {
+                this.a = a
+                this.b = b
+                this.p = p
+            }
+
+            val privateKey = withContext(Dispatchers.IO) {
+                FileUtils.getPrivateKeyFromFile(privateKeyPath)
+            }
+            if (privateKey == null) {
+                resultMessage = "Failed to read private key."
+                throw Exception(resultMessage)
+            }
+
+            val cipherPoints = withContext(Dispatchers.IO) {
+                FileUtils.getPointsFromFile(cipherTextPath)
+            }
+            if (cipherPoints == null || cipherPoints.isEmpty()) {
+                resultMessage = "Failed to read cipher text or cipher text is empty."
+                throw Exception(resultMessage)
+            }
+
+            val startTime = System.nanoTime()
+            val decryptedBytes = withContext(Dispatchers.IO) {
+                ECCEG.decrypt(cipherPoints, privateKey, ecc)
+            }
+            val endTime = System.nanoTime()
+            executionTime = ((endTime - startTime) / 1e6).toString() + " ms"
+
+
+            val newDir = File(Environment.getExternalStorageDirectory(), "/ECCEG_DECRYPTED/")
+            if (!newDir.exists()) {
+                newDir.mkdirs()
+            }
+            val fullSavePath = newDir.absolutePath + "/" + plainTextSavePath
+
+            withContext(Dispatchers.IO) {
+                FileUtils.saveBytesToFile(decryptedBytes, fullSavePath)
+            }
+
+            plainTextHex = withContext(Dispatchers.IO) {
+                FileUtils.showHexFromFile(fullSavePath)
+            }
+            outputFileSize = withContext(Dispatchers.IO) {
+                File(fullSavePath).length().toString()
+            }
+            resultMessage = "Decryption Successful! Saved to $fullSavePath"
+
+        } catch (e: Exception) {
+            resultMessage = "Decryption Error: ${e.message}"
+            e.printStackTrace()
+        } finally {
+            withContext(Dispatchers.Main) {
+                loadingView?.dismiss()
+                binding.outputFileDecryptEcceg.setText(plainTextHex ?: "Error")
+                binding.outputFileSizeDecryptEcceg.setText(outputFileSize ?: "N/A")
+                binding.timeDecryptEcceg.setText(executionTime ?: "N/A")
+                Toast.makeText(context, resultMessage, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        loadingView?.dismiss() // Ensure dialog is dismissed
+        _binding = null
+    }
+
+    companion object {
+        fun newInstance(): ECCEGDecryptFragment {
+            return ECCEGDecryptFragment()
+        }
+    }
 }

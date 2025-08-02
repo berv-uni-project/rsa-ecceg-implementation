@@ -1,215 +1,315 @@
-package id.my.berviantoleo.ecceg_rsa_app.fragment;
+package id.my.berviantoleo.ecceg_rsa_app.fragment
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.os.Environment
+import android.provider.OpenableColumns
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.developer.filepicker.model.DialogConfigs
+import com.developer.filepicker.model.DialogProperties
+import com.developer.filepicker.view.FilePickerDialog
+import id.my.berviantoleo.ecceg_rsa_app.R
+import id.my.berviantoleo.ecceg_rsa_app.databinding.FragmentRsaencryptBinding
+import id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA
+import id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.math.BigInteger
 
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
+class RSAEncryptFragment : Fragment() {
 
-import id.my.berviantoleo.ecceg_rsa_app.R;
-import id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA;
-import com.google.android.material.textfield.TextInputEditText;
-import com.nareshchocha.filepickerlibrary.FilePickerResultContracts;
-import com.nareshchocha.filepickerlibrary.models.DocumentFilePickerConfig;
-import com.nareshchocha.filepickerlibrary.models.FilePickerResult;
+    private var _binding: FragmentRsaencryptBinding? = null
+    private val binding get() = _binding!!
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.math.BigInteger;
-import java.util.Objects;
+    private var publicKeyPath: String? = null
+    private var plainTextPath: String? = null
+    private var publicKey: BigInteger? = null
+    private var n: BigInteger? = null
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+    private lateinit var loadingDialog: AlertDialog
 
-import static android.os.Environment.getExternalStorageDirectory;
+    private lateinit var publicKeyFilePickerLauncher: ActivityResultLauncher<Intent>
+    private lateinit var plainTextFilePickerLauncher: ActivityResultLauncher<Intent>
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RSAEncryptFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class RSAEncryptFragment extends Fragment {
-
-
-    @BindView(R.id.public_key_value)
-    protected TextInputEditText publicKey;
-    @BindView(R.id.n_value_encrypt)
-    protected TextInputEditText nModulus;
-    @BindView(R.id.file_encrypt_value)
-    protected TextInputEditText encryptLoc;
-    @BindView(R.id.file_encrypt_loc_value)
-    protected TextInputEditText encryptLocValue;
-    @BindView(R.id.outputValue)
-    protected TextInputEditText outputValue;
-    @BindView(R.id.InputValue)
-    protected TextInputEditText inputValue;
-    @BindView(R.id.InputSizeValue)
-    protected TextInputEditText inputSize;
-    @BindView(R.id.outputSizeValue)
-    protected TextInputEditText outputSize;
-    @BindView(R.id.timeValue)
-    protected TextInputEditText timeValue;
-    private String keyPath;
-    private AlertDialog dialog;
-    private long startTime;
-
-    public RSAEncryptFragment() {
-        // Required empty public constructor
-    }
-
-    public static RSAEncryptFragment newInstance() {
-        return new RSAEncryptFragment();
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_rsaencrypt, container, false);
-        ButterKnife.bind(this, view);
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setCancelable(false); // if you want user to wait for some process to finish,
-        builder.setView(R.layout.layout_loading_dialog);
-        dialog = builder.create();
-        return view;
-    }
-
-    @OnClick(R.id.open_public_button)
-    void openPublicKey() {
-        ActivityResultLauncher<DocumentFilePickerConfig> launcher = registerForActivityResult(new FilePickerResultContracts.PickDocumentFile(), (ActivityResultCallback<FilePickerResult>) result -> {
-            String errorMessage = result.getErrorMessage();
-            if (errorMessage != null) {
-                Log.e("Picker", errorMessage);
-            } else {
-                keyPath = result.getSelectedFilePath();
-                dialog.show();
-                new OpenKey(RSAEncryptFragment.this).execute(keyPath);
-            }
-        });
-        DocumentFilePickerConfig config = new DocumentFilePickerConfig();
-        launcher.launch(config);
-    }
-
-    @OnClick(R.id.select_encrypt_file_button)
-    void openFileEncrypt() {
-        ActivityResultLauncher<DocumentFilePickerConfig> launcher = registerForActivityResult(new FilePickerResultContracts.PickDocumentFile(), (ActivityResultCallback<FilePickerResult>) result -> {
-            String errorMessage = result.getErrorMessage();
-            if (errorMessage != null) {
-                Log.e("Picker", errorMessage);
-            } else {
-                String path = result.getSelectedFilePath();
-                if (path == null) return;
-                encryptLoc.setText(path);
-                inputSize.setText(String.valueOf(path.length()));
-                dialog.show();
-                new SetInput(RSAEncryptFragment.this).execute(path);
-            }
-        });
-        DocumentFilePickerConfig config = new DocumentFilePickerConfig();
-        launcher.launch(config);
-    }
-
-    @OnClick(R.id.encrypt_button)
-    void encrypt() {
-        if (!Objects.requireNonNull(encryptLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(encryptLocValue.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(nModulus.getText()).toString().equalsIgnoreCase("")
-                && !Objects.requireNonNull(publicKey.getText()).toString().equalsIgnoreCase("")) {
-            dialog.show();
-            File file = Environment.getExternalStorageDirectory();
-            File location = new File(file, "RSA/");
-            if (!location.exists()) {
-                location.mkdir();
-            }
-            new RSAEncryptFragment.Encrypt(RSAEncryptFragment.this).execute(encryptLoc.getText().toString(),
-                    location.getAbsolutePath() + "/" + encryptLocValue.getText().toString(),
-                    nModulus.getText().toString(),
-                    publicKey.getText().toString());
-        }
-    }
-
-    private class Encrypt extends AsyncTask<String, Integer, String> {
-
-        // only retain a weak reference to the activity
-        Encrypt(RSAEncryptFragment context) {
-            new WeakReference<>(context);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            startTime = System.currentTimeMillis();
-            RSA.encryptedFile(strings[0], strings[1], new BigInteger(strings[3]), new BigInteger(strings[2]));
-            return RSA.showHexFromFile(strings[1]);
-        }
-
-        @Override
-        protected void onPostExecute(String hex) {
-            long endTime = System.currentTimeMillis();
-            timeValue.setText(String.valueOf(endTime - startTime));
-            outputValue.setText(hex);
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/RSA/" + Objects.requireNonNull(encryptLocValue.getText()).toString());
-            outputSize.setText(String.valueOf(file.length()));
-            dialog.dismiss();
-            Toast.makeText(getActivity(), "Finished Encrypt", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private class OpenKey extends AsyncTask<String, Integer, String> {
-
-        // only retain a weak reference to the activity
-        OpenKey(RSAEncryptFragment context) {
-            new WeakReference<>(context);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            return RSA.readKey(strings[0]);
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            String[] key = s.split(":");
-            String N = key[0];
-            String pubKey = key[1];
-            publicKey.setText(pubKey);
-            nModulus.setText(N);
-            dialog.dismiss();
-        }
-    }
-
-    private class SetInput extends AsyncTask<String, Integer, String> {
-
-        // only retain a weak reference to the activity
-        SetInput(RSAEncryptFragment context) {
-            new WeakReference<>(context);
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            if (strings.length == 1) {
-                byte[] bytes = RSA.getBytes(strings[0]);
-                if (bytes != null) {
-                    return new String(bytes);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        publicKeyFilePickerLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        publicKeyPath = getPathFromUri(uri)
+                        binding.publicKeyValue.setText(publicKeyPath)
+                        publicKeyPath?.let {
+                            lifecycleScope.launch {
+                                loadKeyDetails(it)
+                            }
+                        }
+                    }
                 }
             }
-            return "";
+
+        plainTextFilePickerLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        plainTextPath = getPathFromUri(uri)
+                        binding.fileEncryptValue.setText(plainTextPath)
+                        plainTextPath?.let {
+                            lifecycleScope.launch {
+                                loadInputFileContent(it)
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentRsaencryptBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupLoadingDialog()
+
+        binding.openPublicButton.setOnClickListener {
+            selectPublicKeyFile()
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            inputValue.setText(s);
-            dialog.dismiss();
+        binding.selectEncryptFileButton.setOnClickListener {
+            selectPlainTextFile()
+        }
+
+        binding.encryptButton.setOnClickListener {
+            encryptData()
+        }
+    }
+
+    private fun setupLoadingDialog() {
+        loadingDialog = AlertDialog.Builder(requireContext())
+            .setMessage("Processing...")
+            .setCancelable(false)
+            .create()
+    }
+
+    private fun selectPublicKeyFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*" // Or a more specific MIME type if you expect certain key file types
+        }
+        publicKeyFilePickerLauncher.launch(intent)
+    }
+
+    private fun selectPlainTextFile() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*" // Allow all file types
+        }
+        plainTextFilePickerLauncher.launch(intent)
+    }
+
+    private fun getPathFromUri(uri: Uri): String? {
+        // This is a simplified way to get a path. For robust solution, especially for cloud files,
+        // you might need to copy the file to cache and use its path.
+        if (uri.scheme == "file") {
+            return uri.path
+        } else if (uri.scheme == "content") {
+            var fileName: String? = null
+            activity?.contentResolver?.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (displayNameIndex != -1) {
+                         fileName = cursor.getString(displayNameIndex)
+                    }
+                }
+            }
+            if (fileName != null) {
+                val cacheDir = requireContext().cacheDir
+                val tempFile = File(cacheDir, fileName)
+                try {
+                    val inputStream: InputStream? = requireContext().contentResolver.openInputStream(uri)
+                    val outputStream = FileOutputStream(tempFile)
+                    inputStream?.copyTo(outputStream)
+                    inputStream?.close()
+                    outputStream.close()
+                    return tempFile.absolutePath
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(context, "Error copying file: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+        return null
+    }
+
+    private suspend fun loadKeyDetails(filePath: String) {
+        withContext(Dispatchers.Main) {
+            loadingDialog.show()
+        }
+        try {
+            val keyDetails = withContext(Dispatchers.IO) {
+                RSA.readKey(filePath)
+            }
+            withContext(Dispatchers.Main) {
+                publicKey = keyDetails.first
+                n = keyDetails.second
+                binding.publicKeyValue.setText(filePath) // Show path
+                // binding.nValueEncrypt.setText(n.toString()) // Optionally display N if needed
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    "Error reading public key: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } finally {
+            withContext(Dispatchers.Main) {
+                loadingDialog.dismiss()
+            }
+        }
+    }
+
+    private suspend fun loadInputFileContent(filePath: String) {
+        withContext(Dispatchers.Main) {
+            loadingDialog.show()
+        }
+        try {
+            val fileContentHex = withContext(Dispatchers.IO) {
+                RSA.showHexFromFile(filePath)
+            }
+            val fileSize = withContext(Dispatchers.IO) {
+                File(filePath).length().toString()
+            }
+            withContext(Dispatchers.Main) {
+                binding.inputValue.setText(fileContentHex)
+                binding.inputSizeValue.setText(fileSize)
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    "Error reading input file: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } finally {
+            withContext(Dispatchers.Main) {
+                loadingDialog.dismiss()
+            }
+        }
+    }
+
+    private fun encryptData() {
+        val publicKeyFileLocation = binding.publicKeyValue.text.toString()
+        val plainTextFileLocation = binding.fileEncryptValue.text.toString()
+        val cipherTextSaveLocation = binding.fileEncryptLocValue.text.toString()
+
+        if (publicKeyFileLocation.isBlank() || plainTextFileLocation.isBlank() || cipherTextSaveLocation.isBlank()) {
+            Toast.makeText(context, "Please select public key, plain text file, and enter save location", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (publicKey == null || n == null) {
+            Toast.makeText(context, "Public key details not loaded correctly. Please re-select the key file.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            performEncryption(plainTextFileLocation, cipherTextSaveLocation, publicKey!!, n!!)
+        }
+    }
+
+    private suspend fun performEncryption(
+        plainTextFilePath: String,
+        cipherTextSaveName: String,
+        keyE: BigInteger,
+        keyN: BigInteger
+    ) {
+        withContext(Dispatchers.Main) {
+            loadingDialog.show()
+        }
+        var resultMessage = "Encryption Failed"
+        var cipherTextHex: String? = null
+        var outputFileSize: String? = null
+        var executionTime: Long? = null
+        var fullSavePath: String? = null
+
+        try {
+            val plainBytes = withContext(Dispatchers.IO) {
+                RSA.getBytes(plainTextFilePath)
+            }
+
+            val startTime = System.nanoTime()
+            val encryptedBytes = withContext(Dispatchers.IO) {
+                RSA.encryptBytes(plainBytes, keyE, keyN)
+            }
+            executionTime = (System.nanoTime() - startTime) / 1000000 // ms
+
+            val newDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "RSA_ENCRYPTED")
+            if (!newDir.exists()) {
+                newDir.mkdirs()
+            }
+            fullSavePath = newDir.absolutePath + File.separator + cipherTextSaveName
+
+            withContext(Dispatchers.IO) {
+                val fos = FileOutputStream(fullSavePath)
+                fos.write(encryptedBytes)
+                fos.close()
+            }
+
+            cipherTextHex = withContext(Dispatchers.IO) {
+                RSA.showHexFromFile(fullSavePath) // Assuming this can read any file for hex display
+            }
+            outputFileSize = withContext(Dispatchers.IO) {
+                File(fullSavePath).length().toString()
+            }
+            resultMessage = "Encryption Successful! Saved to $fullSavePath"
+
+        } catch (e: Exception) {
+            resultMessage = "Encryption Error: ${e.message}"
+            e.printStackTrace()
+        } finally {
+            withContext(Dispatchers.Main) {
+                loadingDialog.dismiss()
+                binding.outputValue.setText(cipherTextHex ?: "Error")
+                binding.outputSizeValue.setText(outputFileSize ?: "N/A")
+                binding.timeValue.setText(executionTime?.toString()?.plus(" ms") ?: "N/A")
+                Toast.makeText(context, resultMessage, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (::loadingDialog.isInitialized && loadingDialog.isShowing) {
+            loadingDialog.dismiss()
+        }
+        _binding = null
+    }
+
+    companion object {
+        fun newInstance(): RSAEncryptFragment {
+            return RSAEncryptFragment()
         }
     }
 }

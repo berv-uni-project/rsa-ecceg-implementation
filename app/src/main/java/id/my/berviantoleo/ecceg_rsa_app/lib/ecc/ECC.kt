@@ -25,7 +25,7 @@ class ECC {
         val m = tigaXkuadrat.add(this.a).multiply(inverseDuaY).mod(this.p)
 
         val x = m.multiply(m).subtract(BigInteger.valueOf(2).multiply(a.x)).add(this.p).mod(this.p)
-        val y = m.multiply(a.x?.subtract(x)).subtract(a.y).add(this.p).mod(this.p)
+        val y = m.multiply(a.x.subtract(x)).subtract(a.y).add(this.p).mod(this.p)
         val point = Point()
         point.x = x
         point.y = y

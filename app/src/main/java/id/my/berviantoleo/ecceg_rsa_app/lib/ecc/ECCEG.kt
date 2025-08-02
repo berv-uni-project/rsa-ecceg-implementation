@@ -14,20 +14,20 @@ class ECCEG {
     val basePoint: Point
     val eCC: ECC
 
-    constructor(ECC: ECC, basePoint: Point) {
-        this.eCC = ECC
+    constructor(ecc: ECC, basePoint: Point) {
+        this.eCC = ecc
         this.basePoint = basePoint
-        this.privateKey = BigInteger(ECC.p.bitLength(), Random())
-            .mod(ECC.p.subtract(BigInteger.ONE))
+        this.privateKey = BigInteger(ecc.p.bitLength(), Random())
+            .mod(ecc.p.subtract(BigInteger.ONE))
             .add(BigInteger.ONE)
-        this.publicKey = ECC.multiply(privateKey!!, basePoint)
+        this.publicKey = ecc.multiply(privateKey!!, basePoint)
     }
 
-    constructor(ECC: ECC, basePoint: Point, privateKey: BigInteger) {
-        this.eCC = ECC
+    constructor(ecc: ECC, basePoint: Point, privateKey: BigInteger) {
+        this.eCC = ecc
         this.basePoint = basePoint
         this.privateKey = privateKey
-        this.publicKey = ECC.multiply(privateKey, basePoint)
+        this.publicKey = ecc.multiply(privateKey, basePoint)
     }
 
     fun getPrivateKey(): BigInteger {
@@ -96,12 +96,17 @@ class ECCEG {
             .add(BigInteger.ONE)
         val left: Point = eCC.multiply(k, basePoint)
         val right: Point = eCC.add(p, eCC.multiply(k, publicKey))
-        return Pair<Point?, Point?>(left, right)
+        return Pair<Point?, Point?>(left, right) // This Pair is non-null
     }
 
-    fun encryptBytes(bytes: ByteArray): MutableList<Pair<Point?, Point?>?> {
-        val ret: MutableList<Pair<Point?, Point?>?> = ArrayList<Pair<Point?, Point?>?>()
-        for (aByte in bytes) ret.add(encrypt(eCC.intToPoint(BigInteger.valueOf(aByte.toLong()))))
+    // Changed return type here
+    fun encryptBytes(bytes: ByteArray): MutableList<Pair<Point?, Point?>> {
+        // The list itself is non-null. It contains non-null Pair objects.
+        val ret = ArrayList<Pair<Point?, Point?>>() 
+        for (aByte in bytes) {
+            // encrypt() returns a non-null Pair, so we can add it directly.
+            ret.add(encrypt(eCC.intToPoint(BigInteger.valueOf(aByte.toLong()))))
+        }
         return ret
     }
 
@@ -110,12 +115,12 @@ class ECCEG {
 
         val minusM = Point()
         minusM.x = m.x
-        minusM.y = m.y?.negate()?.mod(eCC.p)
+        minusM.y = m.y.negate().mod(eCC.p)
         return eCC.add(p.right!!, minusM)
     }
 
     fun decrypt(l: MutableList<Pair<Point?, Point?>>): MutableList<Point?> {
-        val ret: MutableList<Point?> = ArrayList<Point?>()
+        val ret = ArrayList<Point?>()
         for (p in l) ret.add(decrypt(p))
         return ret
     }

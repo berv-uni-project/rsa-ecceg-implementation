@@ -1,217 +1,233 @@
-package id.my.berviantoleo.ecceg_rsa_app.fragment;
+package id.my.berviantoleo.ecceg_rsa_app.fragment
 
 
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Environment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import com.google.android.material.textfield.TextInputEditText;
-import com.obsez.android.lib.filechooser.ChooserDialog;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Objects;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import cc.cloudist.acplibrary.ACProgressFlower;
-import id.my.berviantoleo.ecceg_rsa_app.R;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.ECC;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.ECCEG;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Pair;
-import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Point;
-import id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA;
-import id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils;
-
-import static android.os.Environment.getExternalStorageDirectory;
+import android.view.View
+import androidx.fragment.app.Fragment
+import com.obsez.android.lib.filechooser.ChooserDialog
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Pair
+import id.my.berviantoleo.ecceg_rsa_app.lib.ecc.Point
+import java.io.File
+import java.lang.String
+import java.lang.ref.WeakReference
+import java.math.BigInteger
+import java.util.Objects
+import kotlin.ByteArray
+import kotlin.Exception
+import kotlin.Int
+import kotlin.Long
+import kotlin.collections.MutableList
+import kotlin.collections.plus
+import kotlin.plus
+import kotlin.sequences.plus
+import kotlin.text.equals
+import kotlin.text.plus
+import kotlin.toString
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link ECCEGEncryptFragment#newInstance} factory method to
+ * A simple [Fragment] subclass.
+ * Use the [ECCEGEncryptFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-public class ECCEGEncryptFragment extends Fragment {
-
+class ECCEGEncryptFragment : Fragment() {
+    @JvmField
     @BindView(R.id.public_key_loc_ecceg_value)
-    protected TextInputEditText publicKeyLoc;
+    var publicKeyLoc: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.plain_text_loc_value_ecceg)
-    protected TextInputEditText plainTextLoc;
+    var plainTextLoc: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.cipher_text_loc_ecceg)
-    protected TextInputEditText cipherTextLoc;
+    var cipherTextLoc: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.input_file_encrypt_ecceg)
-    protected TextInputEditText inputContent;
+    var inputContent: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.output_file_encrypt_ecceg)
-    protected TextInputEditText outputContent;
+    var outputContent: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.input_file_size_encrypt_ecceg)
-    protected TextInputEditText inputSize;
+    var inputSize: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.output_file_size_encrypt_ecceg)
-    protected TextInputEditText outputSize;
+    var outputSize: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.time_encrypt_ecceg)
-    protected TextInputEditText timeElapsed;
+    var timeElapsed: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.a_encrypt_ecceg_value)
-    protected TextInputEditText a;
+    var a: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.b_encrypt_ecceg_value)
-    protected TextInputEditText b;
+    var b: TextInputEditText? = null
 
+    @JvmField
     @BindView(R.id.p_encrypt_ecceg_value)
-    protected TextInputEditText p;
+    var p: TextInputEditText? = null
 
-    private ACProgressFlower loadingView;
-    private long startTime;
-    private long endTime;
+    private var loadingView: ACProgressFlower? = null
+    private var startTime: Long = 0
+    private var endTime: Long = 0
 
-    public ECCEGEncryptFragment() {
-        // Required empty public constructor
-    }
-
-    public static ECCEGEncryptFragment newInstance() {
-        return new ECCEGEncryptFragment();
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_eccegencrypt, container, false);
-        ButterKnife.bind(this, view);
-        loadingView = new ACProgressFlower.Builder(getContext()).build();
-        loadingView.setCanceledOnTouchOutside(false);
-        loadingView.setCancelable(false);
-        return view;
+        val view: View = inflater.inflate(R.layout.fragment_eccegencrypt, container, false)
+        ButterKnife.bind(this, view)
+        loadingView = Builder(getContext()).build()
+        loadingView.setCanceledOnTouchOutside(false)
+        loadingView.setCancelable(false)
+        return view
     }
 
     @OnClick(R.id.encrypt_button_ecceg)
-    void encrypt() {
-        if (!Objects.requireNonNull(publicKeyLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(plainTextLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(cipherTextLoc.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(a.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(b.getText()).toString().equalsIgnoreCase("") &&
-                !Objects.requireNonNull(p.getText()).toString().equalsIgnoreCase("")) {
-            File file = Environment.getExternalStorageDirectory();
-            File location = new File(file, "ECCEG/");
+    fun encrypt() {
+        if (!Objects.requireNonNull<Editable?>(publicKeyLoc.getText()).toString().equals(
+                "",
+                ignoreCase = true
+            ) && !Objects.requireNonNull<Editable?>(plainTextLoc.getText()).toString().equals(
+                "",
+                ignoreCase = true
+            ) && !Objects.requireNonNull<Editable?>(cipherTextLoc.getText()).toString()
+                .equals("", ignoreCase = true) && !Objects.requireNonNull<Editable?>(a.getText())
+                .toString()
+                .equals("", ignoreCase = true) && !Objects.requireNonNull<Editable?>(b.getText())
+                .toString()
+                .equals("", ignoreCase = true) && !Objects.requireNonNull<Editable?>(p.getText())
+                .toString().equals("", ignoreCase = true)
+        ) {
+            val file: File? = Environment.getExternalStorageDirectory()
+            val location = File(file, "ECCEG/")
             if (!location.exists()) {
-                location.mkdir();
+                location.mkdir()
             }
-            String cipherLoc = location.getAbsolutePath() + "/" + cipherTextLoc.getText().toString();
-            new ECCEGEncryptFragment.Encrypt(ECCEGEncryptFragment.this).execute(
+            val cipherLoc = location.getAbsolutePath() + "/" + cipherTextLoc.getText().toString()
+            id.my.berviantoleo.ecceg_rsa_app.fragment.ECCEGEncryptFragment.Encrypt(this@ECCEGEncryptFragment)
+                .execute(
                     a.getText().toString(),
                     b.getText().toString(),
                     p.getText().toString(),
                     publicKeyLoc.getText().toString(),
                     plainTextLoc.getText().toString(),
                     cipherLoc
-            );
+                )
         }
     }
 
     @OnClick(R.id.search_public_key_ecceg)
-    void openPublicKey() {
-        new ChooserDialog(getActivity())
-                .withFilter(false, false, "pub")
-                .withStartFile(getExternalStorageDirectory().getAbsolutePath())
-                .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener((path, pathFile) -> publicKeyLoc.setText(pathFile.getPath()))
-                .build()
-                .show();
+    fun openPublicKey() {
+        ChooserDialog(getActivity())
+            .withFilter(false, false, "pub")
+            .withStartFile(Environment.getExternalStorageDirectory().getAbsolutePath())
+            .withResources(
+                R.string.title_choose_file,
+                R.string.title_choose,
+                R.string.dialog_cancel
+            )
+            .withChosenListener({ path, pathFile -> publicKeyLoc.setText(pathFile.getPath()) })
+            .build()
+            .show()
     }
 
     @OnClick(R.id.search_plain_text_ecceg)
-    void searchPlainText() {
-        new ChooserDialog(getActivity())
-                .withStartFile(getExternalStorageDirectory().getAbsolutePath())
-                .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
-                .withChosenListener((path, pathFile) -> {
-                    plainTextLoc.setText(pathFile.getPath());
-                    inputSize.setText(String.valueOf(pathFile.length()));
-                    loadingView.show();
-                    new SetInput(ECCEGEncryptFragment.this).execute(pathFile.getPath());
-                })
-                .build()
-                .show();
+    fun searchPlainText() {
+        ChooserDialog(getActivity())
+            .withStartFile(Environment.getExternalStorageDirectory().getAbsolutePath())
+            .withResources(
+                R.string.title_choose_file,
+                R.string.title_choose,
+                R.string.dialog_cancel
+            )
+            .withChosenListener({ path, pathFile ->
+                plainTextLoc.setText(pathFile.getPath())
+                inputSize.setText(String.valueOf(pathFile.length()))
+                loadingView.show()
+                id.my.berviantoleo.ecceg_rsa_app.fragment.ECCEGEncryptFragment.SetInput(this@ECCEGEncryptFragment)
+                    .execute(pathFile.getPath())
+            })
+            .build()
+            .show()
     }
 
-    private class Encrypt extends AsyncTask<String, Integer, String> {
-
+    private inner class Encrypt(context: ECCEGEncryptFragment?) :
+        AsyncTask<kotlin.String?, Int?, kotlin.String?>() {
         // only retain a weak reference to the activity
-        Encrypt(ECCEGEncryptFragment context) {
-            new WeakReference<>(context);
+        init {
+            WeakReference<ECCEGEncryptFragment?>(context)
         }
 
-        @Override
-        protected String doInBackground(String... strings) {
-            startTime = System.currentTimeMillis();
+        override fun doInBackground(vararg strings: kotlin.String?): kotlin.String {
+            startTime = System.currentTimeMillis()
             try {
-                ECC ecc = new ECC();
-                ecc.a = new BigInteger(strings[0]);
-                ecc.b = new BigInteger(strings[1]);
-                ecc.p = new BigInteger(strings[2]);
-                ecc.k = BigInteger.valueOf(30);
-                ECCEG ecceg = new ECCEG(ecc, ecc.getBasePoint());
-                ecceg.loadPublicKey(strings[3]);
-                byte[] read = FileUtils.getBytes(strings[4]);
-                List<Pair<Point, Point>> enc = ecceg.encryptBytes(read);
-                FileUtils.savePointsToFile(strings[5], enc);
-                endTime = System.currentTimeMillis();
-                return FileUtils.showHexFromFile(strings[5]);
-            } catch (Exception e) {
-                return "failed";
+                val ecc: ECC = ECC()
+                ecc.a = BigInteger(strings[0])
+                ecc.b = BigInteger(strings[1])
+                ecc.p = BigInteger(strings[2])
+                ecc.k = BigInteger.valueOf(30)
+                val ecceg: ECCEG = ECCEG(ecc, ecc.basePoint)
+                ecceg.loadPublicKey(strings[3])
+                val read: ByteArray? =
+                    id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils.getBytes(strings[4])
+                val enc: MutableList<Pair<Point?, Point?>?> = ecceg.encryptBytes(read)
+                id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils.savePointsToFile(strings[5], enc)
+                endTime = System.currentTimeMillis()
+                return id.my.berviantoleo.ecceg_rsa_app.utils.FileUtils.showHexFromFile(strings[5])
+            } catch (e: Exception) {
+                return "failed"
             }
         }
 
-        @Override
-        protected void onPostExecute(String hex) {
-            timeElapsed.setText(String.valueOf(endTime - startTime));
-            outputContent.setText(hex);
-            File file = new File(Environment.getExternalStorageDirectory().getPath() + "/ECCEG/" + Objects.requireNonNull(cipherTextLoc.getText()).toString());
-            outputSize.setText(String.valueOf(file.length()));
-            loadingView.dismiss();
-            Toast.makeText(getActivity(), "Finished Encrypt", Toast.LENGTH_SHORT).show();
+        override fun onPostExecute(hex: kotlin.String?) {
+            timeElapsed.setText((endTime - startTime).toString())
+            outputContent.setText(hex)
+            val file: File = File(
+                Environment.getExternalStorageDirectory()
+                    .getPath() + "/ECCEG/" + Objects.requireNonNull<Editable?>(cipherTextLoc.getText())
+                    .toString()
+            )
+            outputSize.setText(file.length().toString())
+            loadingView.dismiss()
+            Toast.makeText(getActivity(), "Finished Encrypt", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private class SetInput extends AsyncTask<String, Integer, String> {
-
+    private inner class SetInput(context: ECCEGEncryptFragment?) :
+        AsyncTask<kotlin.String?, Int?, kotlin.String?>() {
         // only retain a weak reference to the activity
-        SetInput(ECCEGEncryptFragment context) {
-            new WeakReference<>(context);
+        init {
+            WeakReference<ECCEGEncryptFragment?>(context)
         }
 
-        @Override
-        protected String doInBackground(String... strings) {
-            if (strings.length == 1) {
-                byte[] bytes = RSA.getBytes(strings[0]);
+        override fun doInBackground(vararg strings: kotlin.String?): kotlin.String {
+            if (strings.size == 1) {
+                val bytes: ByteArray? =
+                    id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA.getBytes(strings[0])
                 if (bytes != null) {
-                    return new String(bytes);
+                    return String(bytes)
                 }
             }
-            return "";
+            return ""
         }
 
-        @Override
-        protected void onPostExecute(String s) {
-            inputContent.setText(s);
-            loadingView.dismiss();
+        override fun onPostExecute(s: kotlin.String?) {
+            inputContent.setText(s)
+            loadingView.dismiss()
         }
     }
 
+    companion object {
+        fun newInstance(): ECCEGEncryptFragment {
+            return ECCEGEncryptFragment()
+        }
+    }
 }

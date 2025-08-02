@@ -30,7 +30,7 @@ object FileUtils {
 
                 var offset = 0
                 var numRead = 0
-                while (offset < bytes.size && (`in`.read(bytes, offset, bytes.size - offset)
+                while (offset < bytes!!.size && (`in`.read(bytes, offset, bytes!!.size - offset)
                         .also { numRead = it }) >= 0
                 ) {
                     offset += numRead
@@ -115,9 +115,14 @@ object FileUtils {
 
 
     @JvmStatic
-    fun loadPointsFromFile(stringpath: String): MutableList<Pair<Point?, Point?>?> {
+    fun loadPointsFromFile(stringpath: String): MutableList<Pair<Point?, Point?>> { // Changed return type here
         val rawData = getBytes(stringpath)
-        val pair: MutableList<Pair<Point?, Point?>?> = ArrayList<Pair<Point?, Point?>?>()
+        // The list itself is non-null. It can contain nullable Pair objects.
+        val pair: MutableList<Pair<Point?, Point?>> = ArrayList() 
+        if (rawData == null) { // If rawData is null, return an empty list.
+            return pair
+        }
+
         val btemp = ByteArray(4)
         var f = 0
         var s: Int
@@ -127,8 +132,9 @@ object FileUtils {
         var point2 = Point()
         point2.x = BigInteger.valueOf(1)
         point2.y = BigInteger.valueOf(1)
-        for (i in 0..<(if (rawData != null) rawData.size else 0)) {
-            btemp[i % 4] = rawData!![i]
+        // Loop only if rawData is not null.
+        for (i in 0 until rawData.size) { 
+            btemp[i % 4] = rawData[i] // No need for rawData!![i] due to the null check above
             if (i % 4 == 3) {
                 if ((i / 4) % 4 == 0) {
                     f = bytesToInt(btemp)

@@ -3,24 +3,32 @@ package id.my.berviantoleo.ecceg_rsa_app
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import butterknife.ButterKnife
-import butterknife.OnClick
+import id.my.berviantoleo.ecceg_rsa_app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        ButterKnife.bind(this)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.rsaButton.setOnClickListener {
+            launchRSA()
+        }
+
+        binding.eccegButton.setOnClickListener {
+            launchECCEG()
+        }
     }
 
-    @OnClick(R.id.rsa_button)
-    fun launchRSA() {
+    private fun launchRSA() {
         val intent = Intent(this, RSAActivity::class.java)
         startActivity(intent)
     }
 
-    @OnClick(R.id.ecceg_button)
-    fun launchECCEG() {
+    private fun launchECCEG() {
         val intent = Intent(this, ECCEGActivity::class.java)
         startActivity(intent)
     }
