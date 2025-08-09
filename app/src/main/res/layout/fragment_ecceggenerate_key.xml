@@ -84,19 +84,14 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <mehdi.sakout.fancybuttons.FancyButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/generate_key_ecceg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            fancy:fb_borderColor="#FFFFFF"
-            fancy:fb_borderWidth="1dp"
-            fancy:fb_defaultColor="#000CFF"
-            fancy:fb_focusColor="#9bd823"
-            fancy:fb_iconPosition="left"
-            fancy:fb_radius="10dp"
-            fancy:fb_text="Generate Key"
-            fancy:fb_textColor="#FFFFFF" />
+            android:backgroundTint="#000CFF"
+            android:text="Generate Key"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 

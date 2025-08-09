@@ -84,7 +84,7 @@
             android:text="1024" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <mehdi.sakout.fancybuttons.FancyButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/generate_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -96,13 +96,8 @@
 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/byte_size_layout"
-        fancy:fb_borderColor="#FFFFFF"
-        fancy:fb_borderWidth="1dp"
-        fancy:fb_defaultColor="#0FF00F"
-        fancy:fb_focusColor="#9bd823"
-        fancy:fb_iconPosition="left"
-        fancy:fb_radius="10dp"
-        fancy:fb_text="Generate Key"
-        fancy:fb_textColor="#FFFFFF" />
+        android:backgroundTint="#0FF00F"
+        android:text="Generate Key"
+        android:textColor="#FFFFFF" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,7 +23,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <mehdi.sakout.fancybuttons.FancyButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/rsa_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,16 +33,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        fancy:fb_borderColor="#FFFFFF"
-        fancy:fb_borderWidth="1dp"
-        fancy:fb_defaultColor="#0000FF"
-        fancy:fb_focusColor="#9bd823"
-        fancy:fb_iconPosition="left"
-        fancy:fb_radius="10dp"
-        fancy:fb_text="RSA IMPLEMENTATION"
-        fancy:fb_textColor="#FFFFFF" />
+        android:backgroundTint="#0000FF"
+        android:text="RSA IMPLEMENTATION"
+        android:textColor="#FFFFFF" />
 
-    <mehdi.sakout.fancybuttons.FancyButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ecceg_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,14 +51,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rsa_button"
         app:layout_constraintVertical_bias="0.127"
-        fancy:fb_borderColor="#FFFFFF"
-        fancy:fb_borderWidth="1dp"
-        fancy:fb_defaultColor="#0000FF"
-        fancy:fb_focusColor="#9bd823"
-        fancy:fb_iconPosition="left"
-        fancy:fb_radius="10dp"
-        fancy:fb_text="ECCEG IMPLEMENTATION"
-        fancy:fb_textColor="#FFFFFF" />
+        android:backgroundTint="#0000FF"
+        android:text="ECCEG IMPLEMENTATION"
+        android:textColor="#FFFFFF" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
