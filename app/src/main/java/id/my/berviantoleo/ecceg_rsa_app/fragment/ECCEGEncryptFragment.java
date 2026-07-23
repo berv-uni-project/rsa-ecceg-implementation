@@ -126,7 +126,7 @@ public class ECCEGEncryptFragment extends Fragment {
 
     @OnClick(R.id.search_public_key_ecceg)
     void openPublicKey() {
-        new ChooserDialog(getActivity())
+        new ChooserDialog().with(getActivity())
                 .withFilter(false, false, "pub")
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
@@ -137,7 +137,7 @@ public class ECCEGEncryptFragment extends Fragment {
 
     @OnClick(R.id.search_plain_text_ecceg)
     void searchPlainText() {
-        new ChooserDialog(getActivity())
+        new ChooserDialog().with(getActivity())
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
                 .withChosenListener((path, pathFile) -> {

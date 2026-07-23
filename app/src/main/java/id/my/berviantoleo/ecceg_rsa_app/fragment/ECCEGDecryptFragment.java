@@ -111,7 +111,7 @@ public class ECCEGDecryptFragment extends Fragment {
 
     @OnClick(R.id.search_private_key_ecceg)
     void openPrivateKey() {
-        new ChooserDialog(getActivity())
+        new ChooserDialog().with(getActivity())
                 .withFilter(false, false, "pri")
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
@@ -122,7 +122,7 @@ public class ECCEGDecryptFragment extends Fragment {
 
     @OnClick(R.id.search_cipher_text_ecceg)
     void searchCipherText() {
-        new ChooserDialog(getActivity())
+        new ChooserDialog().with(getActivity())
                 .withStartFile(getExternalStorageDirectory().getAbsolutePath())
                 .withResources(R.string.title_choose_file, R.string.title_choose, R.string.dialog_cancel)
                 .withChosenListener((path, pathFile) -> {

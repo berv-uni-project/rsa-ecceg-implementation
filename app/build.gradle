@@ -4,49 +4,55 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdk 34
+    compileSdk = 37
     defaultConfig {
         applicationId "id.my.berviantoleo.ecceg_rsa_app"
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdkVersion 23
+        targetSdkVersion 37
         versionCode 3
         versionName "1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+    kotlinOptions {
+        jvmTarget = '21'
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     namespace 'id.my.berviantoleo.ecceg_rsa_app'
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation "androidx.core:core-ktx:1.19.0"
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'cc.cloudist.acplibrary:library:1.2.1'
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.jakewharton:butterknife:10.2.3'
-    implementation 'com.github.medyo:fancybuttons:1.9.1'
-    implementation 'com.google.android.material:material:1.14.0'
-    implementation 'com.google.firebase:firebase-crashlytics:20.1.0'
-    implementation 'com.google.firebase:firebase-analytics:23.2.0'
-    implementation 'com.obsez.android.lib.filechooser:filechooser:1.2.0'
-    implementation 'gun0912.ted:tedpermission:2.2.3'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.7.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.legacy.support.v4
+    implementation libs.library
+    implementation libs.multidex
+    implementation libs.butterknife
+    implementation libs.fancybuttons
+    implementation libs.material
+    implementation libs.firebase.crashlytics
+    implementation libs.firebase.analytics
+    implementation libs.filechooser
+    implementation libs.tedpermission
+    implementation libs.kotlin.stdlib.jdk8
+    annotationProcessor libs.butterknife.compiler
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.runner
+    androidTestImplementation libs.androidx.espresso.core
 }
 repositories {
     mavenCentral()

@@ -13,7 +13,7 @@ import id.my.berviantoleo.ecceg_rsa_app.R;
 import id.my.berviantoleo.ecceg_rsa_app.lib.rsa.RSA;
 import com.google.android.material.textfield.TextInputEditText;
 import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
+import com.gun0912.tedpermission.normal.TedPermission;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -88,7 +88,7 @@ public class RSAGenerateKeyFragment extends Fragment {
                 && !Objects.requireNonNull(privateLocation.getText()).toString().equalsIgnoreCase("")
                 && !Objects.requireNonNull(publicLocation.getText()).toString().equalsIgnoreCase("")) {
             if (Integer.valueOf(byteSize.getText().toString()) >= 1024) {
-                TedPermission.with(requireContext())
+                TedPermission.create()
                         .setPermissionListener(extract)
                         .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
                         .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)

@@ -1,0 +1,45 @@
+[versions]
+appcompat = "1.7.1"
+constraintlayout = "2.2.1"
+coreKtx = "1.19.0"
+espressoCore = "3.7.0"
+fancybuttons = "1.8.1"
+filechooser = "1.1.2"
+firebaseAnalytics = "23.2.0"
+firebaseCrashlytics = "20.1.0"
+firebaseCrashlyticsGradle = "3.0.7"
+googleServices = "4.5.0"
+gradle = "9.3.0"
+jakewharton = "10.2.3"
+junit = "4.13.2"
+kotlin = "2.4.10"
+legacySupportV4 = "1.0.0"
+library = "1.2.1"
+material = "1.14.0"
+multidex = "1.0.3"
+runner = "1.7.0"
+tedpermission = "3.4.2"
+
+[libraries]
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+butterknife = { group = "com.jakewharton", name = "butterknife", version.ref = "jakewharton" }
+butterknife-compiler = { group = "com.jakewharton", name = "butterknife-compiler", version.ref = "jakewharton" }
+fancybuttons = { group = "com.github.medyo", name = "fancybuttons", version.ref = "fancybuttons" }
+filechooser = { group = "com.obsez.android.lib.filechooser", name = "filechooser", version.ref = "filechooser" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
+firebase-crashlytics-gradle = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googleServices" }
+gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "gradle" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+library = { group = "com.github.Cloudist", name = "ACProgressLite", version = "1.2.1" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+multidex = { group = "com.android.support", name = "multidex", version.ref = "multidex" }
+tedpermission = { group = "io.github.ParkSangGwon", name = "tedpermission-normal", version.ref = "tedpermission" }
